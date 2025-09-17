@@ -20,7 +20,10 @@ base_packages = [
     'libgcc',
     'libstdc++',
     'linux-glibc-devel',
+    'zlib',
     'zlib-devel',
+    'libuuid',
+    'libexpat',
 ]
 
 unified_packages = [
@@ -28,6 +31,8 @@ unified_packages = [
     'fontconfig-devel',
     'freetype2-devel',
     'libpng-devel',
+    'libfreetype',
+    'libpng',
 ]
 
 
