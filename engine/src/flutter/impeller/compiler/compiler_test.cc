@@ -28,6 +28,7 @@ CompilerTest::CompilerTest() : intermediates_path_(GetIntermediatesPath()) {
       fml::OpenDirectory(intermediates_path_.c_str(),
                          true,  // create if necessary
                          fml::FilePermission::kReadWrite);
+  std::cout << "+++++++ intermediates_path is " << intermediates_path_ << " +++++++" << std::endl;
   FML_CHECK(intermediates_directory_.is_valid());
 }
 

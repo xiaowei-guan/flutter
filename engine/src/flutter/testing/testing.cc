@@ -11,6 +11,11 @@
 
 namespace flutter::testing {
 
+// Provide a hardcoded default path for test fixtures.
+const char* GetFixturesPath() {
+  return "/root/for_unittests";
+}
+
 std::string GetCurrentTestName() {
   return ::testing::UnitTest::GetInstance()->current_test_info()->name();
 }

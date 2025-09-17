@@ -29,13 +29,18 @@ Switches MakeSwitchesDesktopGL(
 }
 
 TEST(SwitchesTest, DoesntMangleUnicodeIncludes) {
-  const char* directory_name = "test_shader_include_Ã�";
+  const char* directory_name = "test_shader_include_unicode";
   fml::CreateDirectory(flutter::testing::OpenFixturesDirectory(),
                        {directory_name}, fml::FilePermission::kRead);
+
+  std::cout << "-------directory_name is " << directory_name << " ---" << std::endl;
 
   auto include_path =
       std::string(flutter::testing::GetFixturesPath()) + "/" + directory_name;
   auto include_option = "--include=" + include_path;
+
+  std::cout << "-------include_path is " << include_path << " ---" << std::endl;
+  std::cout << "-------include_option is " << include_option << " ---" << std::endl;
 
   Switches switches = MakeSwitchesDesktopGL({include_option.c_str()});
 

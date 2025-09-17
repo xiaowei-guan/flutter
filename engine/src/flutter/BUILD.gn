@@ -162,6 +162,10 @@ group("flutter") {
       is_ios) {
     public_deps += [ "//flutter/testing/ios_scenario_app" ]
   }
+
+  public_deps += [
+    "//flutter/impeller:tizen_unittests",
+  ]
 }
 
 group("unittests") {

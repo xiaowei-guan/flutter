@@ -15,11 +15,11 @@ import("//flutter/testing/testing.gni")
 #                               target platform, this target is a no-op.
 #
 template("impeller_component") {
-  if (defined(invoker.testonly) && invoker.testonly && !enable_unittests) {
-    group(target_name) {
-      not_needed(invoker, "*")
-    }
-  } else {
+  #if (defined(invoker.testonly) && invoker.testonly && !enable_unittests) {
+  #  group(target_name) {
+  #    not_needed(invoker, "*")
+  #  }
+  #} else {
     target_type = "source_set"
     if (defined(invoker.target_type)) {
       target_type = invoker.target_type
@@ -54,5 +54,5 @@ template("impeller_component") {
         cflags_objcc += flutter_cflags_objcc
       }
     }
-  }
+  #}
 }

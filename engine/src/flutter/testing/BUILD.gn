@@ -56,7 +56,13 @@ source_set("testing") {
     # configs += [ "//flutter/shell/platform/linux/config:gtk" ]
   }
 
-  public_deps = [ ":testing_lib" ]
+  #public_deps = [ ":testing_lib" ]
+  public_deps = [
+    ":testing_lib",
+    #":testing_fixtures",
+    "//flutter/third_party/googletest:gtest",
+    "//flutter/third_party/googletest:gtest_main",
+  ]
   public_configs = [ ":dynamic_symbols" ]
 }
 
@@ -174,7 +180,8 @@ if (enable_unittests && shell_enable_vulkan) {
   }
 }
 
-if (enable_unittests) {
+#if (enable_unittests) {
+  if (true) {
   test_fixtures("testing_fixtures") {
     fixtures = []
   }

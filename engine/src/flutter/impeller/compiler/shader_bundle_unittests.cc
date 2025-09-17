@@ -140,6 +140,8 @@ TEST(ShaderBundleTest, GenerateShaderBundleFlatbufferProducesCorrectResult) {
   options.target_platform = TargetPlatform::kRuntimeStageMetal;
   options.source_language = SourceLanguage::kGLSL;
 
+  std::cout << "Using config ----- " << config << std::endl;
+
   std::optional<fb::shaderbundle::ShaderBundleT> bundle =
       GenerateShaderBundleFlatbuffer(config, options);
   ASSERT_TRUE(bundle.has_value());
