@@ -16,8 +16,8 @@
 #include "impeller/renderer/render_target.h"
 #include "impeller/runtime_stage/runtime_stage.h"
 
-#define GLFW_INCLUDE_NONE
-#include "third_party/glfw/include/GLFW/glfw3.h"
+//#define GLFW_INCLUDE_NONE
+//#include "third_party/glfw/include/GLFW/glfw3.h"
 
 #include "flutter/fml/paths.h"
 #include "impeller/base/validation.h"
@@ -30,7 +30,7 @@
 #include "impeller/playground/playground_impl.h"
 #include "impeller/renderer/context.h"
 #include "impeller/renderer/render_pass.h"
-#include "third_party/imgui/backends/imgui_impl_glfw.h"
+//#include "third_party/imgui/backends/imgui_impl_glfw.h"
 #include "third_party/imgui/imgui.h"
 
 #if FML_OS_MACOSX
@@ -165,6 +165,7 @@ bool Playground::ShouldOpenNewPlaygrounds() {
   return gShouldOpenNewPlaygrounds;
 }
 
+/*
 static void PlaygroundKeyCallback(GLFWwindow* window,
                                   int key,
                                   int scancode,
@@ -177,7 +178,7 @@ static void PlaygroundKeyCallback(GLFWwindow* window,
     ::glfwSetWindowShouldClose(window, GLFW_TRUE);
   }
 }
-
+*/
 Point Playground::GetCursorPosition() const {
   return cursor_position_;
 }
@@ -223,6 +224,7 @@ bool Playground::OpenPlaygroundHere(
   if (!window) {
     return false;
   }
+  /*
   ::glfwSetWindowTitle(window, GetWindowTitle().c_str());
   ::glfwSetWindowUserPointer(window, this);
   ::glfwSetWindowSizeCallback(
@@ -234,12 +236,13 @@ bool Playground::OpenPlaygroundHere(
         }
         playground->SetWindowSize(ISize{width, height}.Max({}));
       });
-  ::glfwSetKeyCallback(window, &PlaygroundKeyCallback);
+  //::glfwSetKeyCallback(window, &PlaygroundKeyCallback);
   ::glfwSetCursorPosCallback(window, [](GLFWwindow* window, double x,
                                         double y) {
     reinterpret_cast<Playground*>(::glfwGetWindowUserPointer(window))
         ->SetCursorPosition({static_cast<Scalar>(x), static_cast<Scalar>(y)});
   });
+  
 
   ImGui_ImplGlfw_InitForOther(window, true);
   fml::ScopedCleanupClosure shutdown_imgui([]() { ImGui_ImplGlfw_Shutdown(); });
@@ -253,7 +256,7 @@ bool Playground::OpenPlaygroundHere(
   ::glfwSetWindowSize(window, GetWindowSize().width, GetWindowSize().height);
   ::glfwSetWindowPos(window, 200, 100);
   ::glfwShowWindow(window);
-
+*/
   while (true) {
 #if FML_OS_MACOSX
     fml::ScopedNSAutoreleasePool pool;

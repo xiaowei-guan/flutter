@@ -19,6 +19,7 @@
 #include "impeller/playground/switches.h"
 #include "impeller/renderer/render_pass.h"
 #include "impeller/runtime_stage/runtime_stage.h"
+#include "impeller/playground/tizen_window_ecore_wl2.h"
 
 namespace impeller {
 
@@ -136,6 +137,7 @@ class Playground {
   Point cursor_position_;
   ISize window_size_ = ISize{1024, 768};
   std::shared_ptr<HostBuffer> host_buffer_;
+  std::shared_ptr<TizenWindowEcoreWl2> tizen_window_ = nullptr;
 
   void SetCursorPosition(Point pos);
 

@@ -5,8 +5,80 @@
 import("//flutter/impeller/tools/impeller.gni")
 import("//flutter/testing/testing.gni")
 
+
 impeller_component("playground") {
   testonly = true
+  include_dirs = [
+    "$custom_sysroot/usr/include/appfw",
+    "$custom_sysroot/usr/include/base",
+    "$custom_sysroot/usr/include/dali",
+    "$custom_sysroot/usr/include/dali-adaptor",
+    "$custom_sysroot/usr/include/dali-toolkit",
+    "$custom_sysroot/usr/include/dlog",
+    "$custom_sysroot/usr/include/ecore-1",
+    "$custom_sysroot/usr/include/ecore-con-1",
+    "$custom_sysroot/usr/include/ecore-evas-1",
+    "$custom_sysroot/usr/include/ecore-file-1",
+    "$custom_sysroot/usr/include/ecore-imf-1",
+    "$custom_sysroot/usr/include/ecore-imf-evas-1",
+    "$custom_sysroot/usr/include/ecore-input-1",
+    "$custom_sysroot/usr/include/ecore-input-evas-1",
+    "$custom_sysroot/usr/include/ecore-wayland-1",
+    "$custom_sysroot/usr/include/ecore-wl2-1",
+    "$custom_sysroot/usr/include/edje-1",
+    "$custom_sysroot/usr/include/eet-1",
+    "$custom_sysroot/usr/include/efl-1",
+    "$custom_sysroot/usr/include/efl-extension",
+    "$custom_sysroot/usr/include/efl-1/interfaces",
+    "$custom_sysroot/usr/include/efreet-1",
+    "$custom_sysroot/usr/include/eina-1",
+    "$custom_sysroot/usr/include/eina-1/eina",
+    "$custom_sysroot/usr/include/eldbus-1",
+    "$custom_sysroot/usr/include/elementary-1",
+    "$custom_sysroot/usr/include/emile-1",
+    "$custom_sysroot/usr/include/eo-1",
+    "$custom_sysroot/usr/include/ethumb-1",
+    "$custom_sysroot/usr/include/ethumb-client-1",
+    "$custom_sysroot/usr/include/evas-1",
+    "$custom_sysroot/usr/include/feedback",
+    "$custom_sysroot/usr/include/system",
+    "$custom_sysroot/usr/include/tzsh",
+    "$custom_sysroot/usr/include/vconf",
+    "$custom_sysroot/usr/include/wayland-extension",
+  ]
+  libs = [
+      "base-utils-i18n",
+      "capi-appfw-application",
+      "capi-appfw-app-common",
+      "capi-appfw-app-control",
+      "capi-appfw-preference",
+      "capi-base-common",
+      "capi-system-info",
+      "capi-system-system-settings",
+      "capi-ui-efl-util",
+      "dlog",
+      "ecore",
+      "ecore_evas",
+      "ecore_imf",
+      "ecore_imf_evas",
+      "ecore_input",
+      "ecore_wl2",
+      "efl-extension",
+      "eina",
+      "eldbus",
+      "elementary",
+      "evas",
+      "feedback",
+      "flutter_engine",
+      "tbm",
+      "tdm-client",
+      "tizen-extension-client",
+      "vconf",
+      "vulkan",
+      "wayland-client",
+      "EGL",
+      "GLESv2",
+    ]
 
   sources = [
     "playground.cc",
@@ -17,6 +89,8 @@ impeller_component("playground") {
     "switches.h",
     "widgets.cc",
     "widgets.h",
+    "tizen_window_ecore_wl2.cc",
+    "tizen_window_ecore_wl2.h",
 
     # Swiftshader is Vulkan backend specific but the utilities are not.
     "backend/vulkan/swiftshader_utilities.cc",
@@ -24,13 +98,7 @@ impeller_component("playground") {
   ]
 
   deps = [ "../renderer/backend" ]
-
-  if (impeller_enable_metal) {
-    sources += [
-      "backend/metal/playground_impl_mtl.h",
-      "backend/metal/playground_impl_mtl.mm",
-    ]
-  }
+  
 
   if (impeller_enable_opengles) {
     sources += [
@@ -54,8 +122,8 @@ impeller_component("playground") {
     "imgui:imgui_impeller_backend",
     "//flutter/fml",
     "//flutter/testing:testing_lib",
-    "//flutter/third_party/glfw",
-    "//flutter/third_party/imgui:imgui_glfw",
+    #"//flutter/third_party/glfw",
+    #"//flutter/third_party/imgui:imgui_glfw",
   ]
 
   if (impeller_supports_rendering) {
