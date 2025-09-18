@@ -77,7 +77,6 @@ class TizenWindowEcoreWl2 {
                       bool top_level,
                       bool pointing_device_support,
                       bool floating_menu_support,
-                      void* window_handle,
                       bool is_vulkan);
 
   ~TizenWindowEcoreWl2();
@@ -110,8 +109,12 @@ class TizenWindowEcoreWl2 {
 
   void UpdateFlutterCursor(const std::string& kind);
 
+  void SetView(TizenViewEventHandlerDelegate* view_delegate) {
+    view_delegate_ = view_delegate;
+  }
+
  private:
-  bool CreateWindow(void* window_handle);
+  bool CreateWindow();
 
   void DestroyWindow();
 

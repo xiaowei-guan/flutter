@@ -16,8 +16,8 @@
 #include "impeller/renderer/render_target.h"
 #include "impeller/runtime_stage/runtime_stage.h"
 
-//#define GLFW_INCLUDE_NONE
-//#include "third_party/glfw/include/GLFW/glfw3.h"
+// #define GLFW_INCLUDE_NONE
+// #include "third_party/glfw/include/GLFW/glfw3.h"
 
 #include "flutter/fml/paths.h"
 #include "impeller/base/validation.h"
@@ -30,7 +30,7 @@
 #include "impeller/playground/playground_impl.h"
 #include "impeller/renderer/context.h"
 #include "impeller/renderer/render_pass.h"
-//#include "third_party/imgui/backends/imgui_impl_glfw.h"
+// #include "third_party/imgui/backends/imgui_impl_glfw.h"
 #include "third_party/imgui/imgui.h"
 
 #if FML_OS_MACOSX
@@ -54,7 +54,7 @@ std::string PlaygroundBackendToString(PlaygroundBackend backend) {
   }
   FML_UNREACHABLE();
 }
-
+/**
 static void InitializeGLFWOnce() {
   // This guard is a hack to work around a problem where glfwCreateWindow
   // hangs when opening a second window after GLFW has been reinitialized (for
@@ -80,10 +80,14 @@ static void InitializeGLFWOnce() {
     FML_CHECK(::glfwInit() == GLFW_TRUE);
   });
 }
+ */
 
 Playground::Playground(PlaygroundSwitches switches) : switches_(switches) {
-  InitializeGLFWOnce();
-  SetupSwiftshaderOnce(switches_.use_swiftshader);
+  // InitializeGLFWOnce();
+  // SetupSwiftshaderOnce(switches_.use_swiftshader);
+  TizenGeometry geometry = {0, 0, 1920, 1080};
+  tizen_window_ = std::make_shared<TizenWindowEcoreWl2>(
+      geometry, false, true, true, true, false, false);
 }
 
 Playground::~Playground() = default;
@@ -199,6 +203,7 @@ void Playground::SetCursorPosition(Point pos) {
   cursor_position_ = pos;
 }
 
+
 bool Playground::OpenPlaygroundHere(
     const Playground::RenderCallback& render_callback) {
   if (!switches_.enable_playground) {
@@ -208,7 +213,7 @@ bool Playground::OpenPlaygroundHere(
   if (!render_callback) {
     return true;
   }
-
+  /** 
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   fml::ScopedCleanupClosure destroy_imgui_context(
@@ -219,12 +224,12 @@ bool Playground::OpenPlaygroundHere(
   io.IniFilename = nullptr;
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
   io.ConfigWindowsResizeFromEdges = true;
-
+  
   auto window = reinterpret_cast<GLFWwindow*>(impl_->GetWindowHandle());
   if (!window) {
     return false;
   }
-  /*
+  
   ::glfwSetWindowTitle(window, GetWindowTitle().c_str());
   ::glfwSetWindowUserPointer(window, this);
   ::glfwSetWindowSizeCallback(
@@ -242,8 +247,8 @@ bool Playground::OpenPlaygroundHere(
     reinterpret_cast<Playground*>(::glfwGetWindowUserPointer(window))
         ->SetCursorPosition({static_cast<Scalar>(x), static_cast<Scalar>(y)});
   });
-  
-
+*/
+/** 
   ImGui_ImplGlfw_InitForOther(window, true);
   fml::ScopedCleanupClosure shutdown_imgui([]() { ImGui_ImplGlfw_Shutdown(); });
 
@@ -257,7 +262,8 @@ bool Playground::OpenPlaygroundHere(
   ::glfwSetWindowPos(window, 200, 100);
   ::glfwShowWindow(window);
 */
-  while (true) {
+  //while (true) {
+/**   
 #if FML_OS_MACOSX
     fml::ScopedNSAutoreleasePool pool;
 #endif
@@ -329,9 +335,11 @@ bool Playground::OpenPlaygroundHere(
   }
 
   ::glfwHideWindow(window);
+*/  
 
   return true;
 }
+
 
 bool Playground::OpenPlaygroundHere(SinglePassCallback pass_callback) {
   return OpenPlaygroundHere(
@@ -528,5 +536,58 @@ Playground::VKProcAddressResolver Playground::CreateVKProcAddressResolver()
     const {
   return impl_->CreateVKProcAddressResolver();
 }
+
+void Playground::OnResize(int32_t left,
+                          int32_t top,
+                          int32_t width,
+                          int32_t height) {
+    SetWindowSize(ISize{width, height}.Max({}));
+}
+
+void Playground::OnRotate(int32_t degree) {}
+
+void Playground::OnPointerMove(double x,
+                               double y,
+                               size_t timestamp,
+
+                               int32_t device_id) {}
+
+void Playground::OnPointerDown(double x,
+                               double y,
+
+                               size_t timestamp,
+
+                               int32_t device_id) {}
+
+void Playground::OnPointerUp(double x,
+                             double y,
+                             size_t timestamp,
+                             int32_t device_id) {
+  SetCursorPosition({static_cast<Scalar>(x), static_cast<Scalar>(y)});
+}
+
+void Playground::OnScroll(double x,
+                          double y,
+                          double delta_x,
+                          double delta_y,
+                          size_t timestamp,
+
+                          int32_t device_id) {}
+
+void Playground::OnKey(const char* key,
+                       const char* string,
+                       const char* compose,
+                       uint32_t modifiers,
+                       uint32_t scan_code,
+                       const char* device_name,
+                       bool is_down) {}
+
+void Playground::OnComposeBegin() {}
+
+void Playground::OnComposeChange(const std::string& str, int cursor_pos) {}
+
+void Playground::OnComposeEnd() {}
+
+void Playground::OnCommit(const std::string& str) {}
 
 }  // namespace impeller

@@ -17,9 +17,9 @@
 #include "impeller/playground/image/compressed_image.h"
 #include "impeller/playground/image/decompressed_image.h"
 #include "impeller/playground/switches.h"
+#include "impeller/playground/tizen_window_ecore_wl2.h"
 #include "impeller/renderer/render_pass.h"
 #include "impeller/runtime_stage/runtime_stage.h"
-#include "impeller/playground/tizen_window_ecore_wl2.h"
 
 namespace impeller {
 
@@ -46,7 +46,7 @@ constexpr inline RuntimeStageBackend PlaygroundBackendToRuntimeStageBackend(
 
 std::string PlaygroundBackendToString(PlaygroundBackend backend);
 
-class Playground {
+class Playground : public TizenViewEventHandlerDelegate {
  public:
   using SinglePassCallback = std::function<bool(RenderPass& pass)>;
 
@@ -55,6 +55,57 @@ class Playground {
   virtual ~Playground();
 
   static bool ShouldOpenNewPlaygrounds();
+
+  void OnResize(int32_t left,
+                int32_t top,
+                int32_t width,
+                int32_t height) override;
+
+  void OnRotate(int32_t degree) override;
+
+  void OnPointerMove(double x,
+                     double y,
+                     size_t timestamp,
+
+                     int32_t device_id) override;
+
+  void OnPointerDown(double x,
+                     double y,
+
+                     size_t timestamp,
+
+                     int32_t device_id) override;
+
+  void OnPointerUp(double x,
+                   double y,
+
+                   size_t timestamp,
+
+                   int32_t device_id) override;
+
+  void OnScroll(double x,
+                double y,
+                double delta_x,
+                double delta_y,
+                size_t timestamp,
+
+                int32_t device_id) override;
+
+  void OnKey(const char* key,
+             const char* string,
+             const char* compose,
+             uint32_t modifiers,
+             uint32_t scan_code,
+             const char* device_name,
+             bool is_down) override;
+
+  void OnComposeBegin() override;
+
+  void OnComposeChange(const std::string& str, int cursor_pos) override;
+
+  void OnComposeEnd() override;
+
+  void OnCommit(const std::string& str) override;
 
   void SetupContext(PlaygroundBackend backend,
                     const PlaygroundSwitches& switches);
