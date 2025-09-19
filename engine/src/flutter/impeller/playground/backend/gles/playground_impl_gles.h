@@ -7,7 +7,7 @@
 
 #include "impeller/playground/playground_impl.h"
 
-#include <egl.h>
+#include <EGL/egl.h>
 
 #include <string>
 

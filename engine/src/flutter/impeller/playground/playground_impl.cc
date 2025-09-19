@@ -32,7 +32,7 @@ std::unique_ptr<PlaygroundImpl> PlaygroundImpl::Create(
 #endif  // IMPELLER_ENABLE_METAL
 #if IMPELLER_ENABLE_OPENGLES
     case PlaygroundBackend::kOpenGLES:
-      return std::make_unique<PlaygroundImplGLES>(switches);
+      return std::make_unique<PlaygroundImplGLES>(switches, nullptr);
 #endif  // IMPELLER_ENABLE_OPENGLES
 #if IMPELLER_ENABLE_VULKAN
     case PlaygroundBackend::kVulkan:

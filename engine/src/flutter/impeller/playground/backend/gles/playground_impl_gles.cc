@@ -11,9 +11,10 @@
 #include <dlfcn.h>
 #endif
 
-#define EFL_BETA_API_SUPPORT
+//#define EFL_BETA_API_SUPPORT
 #include <Ecore_Wl2.h>
 #include <GLES2/gl2.h>
+#define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2ext.h>
 #include <tbm_dummy_display.h>
 #include <tbm_surface.h>
