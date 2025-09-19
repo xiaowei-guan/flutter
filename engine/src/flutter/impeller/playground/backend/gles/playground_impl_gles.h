@@ -7,26 +7,41 @@
 
 #include "impeller/playground/playground_impl.h"
 
+#include <egl.h>
+
+#include <string>
+
+#include "impeller/playground/tizen_window_ecore_wl2.h"
+
 namespace impeller {
+
+using SharedHandle = std::shared_ptr<TizenWindowEcoreWl2>;
 
 class PlaygroundImplGLES final : public PlaygroundImpl {
  public:
-  explicit PlaygroundImplGLES(PlaygroundSwitches switches);
+  explicit PlaygroundImplGLES(PlaygroundSwitches switches, SharedHandle window_ecore_handle);
 
   ~PlaygroundImplGLES();
 
   fml::Status SetCapabilities(
       const std::shared_ptr<Capabilities>& capabilities) override;
 
+private:
+  bool CreateSurface(void* render_target,
+                     void* render_target_display,
+                     int32_t width,
+                     int32_t height);
+
+  void DestroySurface();
+  bool ChooseEGLConfiguration();
+  void* OnProcResolver(const char* name) const;
+
  private:
   class ReactorWorker;
 
-  static void DestroyWindowHandle(WindowHandle handle);
-  using UniqueHandle = std::unique_ptr<void, decltype(&DestroyWindowHandle)>;
-  UniqueHandle handle_;
+  SharedHandle window_ecore_handle_;
+
   std::shared_ptr<ReactorWorker> worker_;
-  const bool use_angle_;
-  void* angle_glesv2_;
 
   // |PlaygroundImpl|
   std::shared_ptr<Context> GetContext() const override;
@@ -45,6 +60,14 @@ class PlaygroundImplGLES final : public PlaygroundImpl {
   PlaygroundImplGLES(const PlaygroundImplGLES&) = delete;
 
   PlaygroundImplGLES& operator=(const PlaygroundImplGLES&) = delete;
+
+  private:
+    EGLConfig egl_config_ = nullptr;
+    EGLDisplay egl_display_ = EGL_NO_DISPLAY;
+    EGLContext egl_context_ = EGL_NO_CONTEXT;
+    EGLSurface egl_surface_ = EGL_NO_SURFACE;
+    EGLContext egl_resource_context_ = EGL_NO_CONTEXT;
+    EGLSurface egl_resource_surface_ = EGL_NO_SURFACE;
 };
 
 }  // namespace impeller

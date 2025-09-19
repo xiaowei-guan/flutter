@@ -2,8 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+<<<<<<< HEAD
 #ifndef FLUTTER_IMPELLER_PLAYGROUND_TIZEN_WINDOW_ECORE_WL2_H_
 #define FLUTTER_IMPELLER_PLAYGROUND_TIZEN_WINDOW_ECORE_WL2_H_
+=======
+#ifndef FLUTTER_IMPELLER_PLAYGROUND_PLAYGROUND_WAYLAND_H_
+#define FLUTTER_IMPELLER_PLAYGROUND_PLAYGROUND_WAYLAND_H_
+>>>>>>> beb75ae78e (playground test)
 
 #define EFL_BETA_API_SUPPORT
 #include <Ecore_Wl2.h>
@@ -77,6 +82,10 @@ class TizenWindowEcoreWl2 {
                       bool top_level,
                       bool pointing_device_support,
                       bool floating_menu_support,
+<<<<<<< HEAD
+=======
+                      void* window_handle,
+>>>>>>> beb75ae78e (playground test)
                       bool is_vulkan);
 
   ~TizenWindowEcoreWl2();
@@ -109,12 +118,17 @@ class TizenWindowEcoreWl2 {
 
   void UpdateFlutterCursor(const std::string& kind);
 
+<<<<<<< HEAD
   void SetView(TizenViewEventHandlerDelegate* view_delegate) {
     view_delegate_ = view_delegate;
   }
 
  private:
   bool CreateWindow();
+=======
+ private:
+  bool CreateWindow(void* window_handle);
+>>>>>>> beb75ae78e (playground test)
 
   void DestroyWindow();
 
@@ -157,4 +171,8 @@ class TizenWindowEcoreWl2 {
 
 }  // namespace impeller
 
+<<<<<<< HEAD
 #endif  // FLUTTER_IMPELLER_PLAYGROUND_TIZEN_WINDOW_ECORE_WL2_H_
+=======
+#endif
+>>>>>>> beb75ae78e (playground test)

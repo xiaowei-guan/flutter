@@ -13,8 +13,7 @@ declare_args() {
   impeller_enable_metal = (is_mac || is_ios) && target_os != "fuchsia"
 
   # Whether the OpenGLES backend is enabled.
-  impeller_enable_opengles = (is_linux || is_win || is_android || is_mac ||
-                              enable_unittests) && target_os != "fuchsia"
+  impeller_enable_opengles = true
 
   # Whether the Vulkan backend is enabled.
   impeller_enable_vulkan = (is_win || is_android || is_mac ||

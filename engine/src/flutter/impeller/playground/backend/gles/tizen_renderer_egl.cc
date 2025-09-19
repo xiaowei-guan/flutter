@@ -1,15 +1,9 @@
-// Copyright 2013 The Flutter Authors. All rights reserved.
+// Copyright 2020 Samsung Electronics Co., Ltd. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "impeller/playground/backend/gles/playground_impl_gles.h"
 #include "flutter/fml/logging.h"
-
-#define IMPELLER_PLAYGROUND_SUPPORTS_ANGLE FML_OS_MACOSX
-
-#if IMPELLER_PLAYGROUND_SUPPORTS_ANGLE
-#include <dlfcn.h>
-#endif
+#include "impeller/playground/backend/gles/tizen_renderer_egl.h"
 
 #define EFL_BETA_API_SUPPORT
 #include <Ecore_Wl2.h>
@@ -19,164 +13,22 @@
 #include <tbm_surface.h>
 #include <tbm_surface_queue.h>
 
-// #define GLFW_INCLUDE_NONE
-// #include "third_party/glfw/include/GLFW/glfw3.h"
-
-#include "flutter/fml/build_config.h"
-#include "impeller/entity/gles/entity_shaders_gles.h"
-#include "impeller/entity/gles/framebuffer_blend_shaders_gles.h"
-#include "impeller/entity/gles/modern_shaders_gles.h"
-#include "impeller/fixtures/gles/fixtures_shaders_gles.h"
-#include "impeller/fixtures/gles/modern_fixtures_shaders_gles.h"
-//#include "impeller/playground/imgui/gles/imgui_shaders_gles.h"
-#include "impeller/renderer/backend/gles/context_gles.h"
-#include "impeller/renderer/backend/gles/surface_gles.h"
-
 namespace impeller {
 
-class PlaygroundImplGLES::ReactorWorker final : public ReactorGLES::Worker {
- public:
-  ReactorWorker() = default;
-
-  // |ReactorGLES::Worker|
-  bool CanReactorReactOnCurrentThreadNow(
-      const ReactorGLES& reactor) const override {
-    ReaderLock lock(mutex_);
-    auto found = reactions_allowed_.find(std::this_thread::get_id());
-    if (found == reactions_allowed_.end()) {
-      return false;
-    }
-    return found->second;
-  }
-
-  void SetReactionsAllowedOnCurrentThread(bool allowed) {
-    WriterLock lock(mutex_);
-    reactions_allowed_[std::this_thread::get_id()] = allowed;
-  }
-
- private:
-  mutable RWMutex mutex_;
-  std::map<std::thread::id, bool> reactions_allowed_ IPLR_GUARDED_BY(mutex_);
-
-  ReactorWorker(const ReactorWorker&) = delete;
-
-  ReactorWorker& operator=(const ReactorWorker&) = delete;
-};
-
-PlaygroundImplGLES::PlaygroundImplGLES(PlaygroundSwitches switches, SharedHandle window_ecore_handle)
-    : PlaygroundImpl(switches),
-      worker_(std::shared_ptr<ReactorWorker>(new ReactorWorker())) {
-
-  window_ecore_handle_ = window_ecore_handle;
-  TizenGeometry geometry = window_ecore_handle_->GetGeometry();
-  CreateSurface(window_ecore_handle_->GetRenderTarget(),
-                         window_ecore_handle_->GetRenderTargetDisplay(), geometry.width,
+TizenRendererEgl::TizenRendererEgl(TizenWindowEcoreWl2* window_ecore,
+                                   bool enable_impeller)
+    : enable_impeller_(enable_impeller) {
+  TizenGeometry geometry = window_ecore->GetGeometry();
+  CreateSurface(window_ecore->GetRenderTarget(),
+                         window_ecore->GetRenderTargetDisplay(), geometry.width,
                          geometry.height);
-
-  eglMakeCurrent(egl_display_, egl_surface_, egl_surface_, egl_context_);
-  worker_->SetReactionsAllowedOnCurrentThread(true);
 }
 
-PlaygroundImplGLES::~PlaygroundImplGLES() {
+TizenRendererEgl::~TizenRendererEgl() {
   DestroySurface();
 }
 
-static std::vector<std::shared_ptr<fml::Mapping>>
-ShaderLibraryMappingsForPlayground() {
-  return {
-      std::make_shared<fml::NonOwnedMapping>(
-          impeller_entity_shaders_gles_data,
-          impeller_entity_shaders_gles_length),
-      std::make_shared<fml::NonOwnedMapping>(
-          impeller_modern_shaders_gles_data,
-          impeller_modern_shaders_gles_length),
-      std::make_shared<fml::NonOwnedMapping>(
-          impeller_framebuffer_blend_shaders_gles_data,
-          impeller_framebuffer_blend_shaders_gles_length),
-      std::make_shared<fml::NonOwnedMapping>(
-          impeller_fixtures_shaders_gles_data,
-          impeller_fixtures_shaders_gles_length),
-      std::make_shared<fml::NonOwnedMapping>(
-          impeller_modern_fixtures_shaders_gles_data,
-          impeller_modern_fixtures_shaders_gles_length),
-      // std::make_shared<fml::NonOwnedMapping>(
-      //     impeller_imgui_shaders_gles_data, impeller_imgui_shaders_gles_length),
-  };
-}
-
-// |PlaygroundImpl|
-std::shared_ptr<Context> PlaygroundImplGLES::GetContext() const {
-  auto gl = std::make_unique<ProcTableGLES>(CreateGLProcAddressResolver());
-  if (!gl->IsValid()) {
-    FML_LOG(ERROR) << "Proc table when creating a playground was invalid.";
-    return nullptr;
-  }
-
-  auto context =
-      ContextGLES::Create(switches_.flags, std::move(gl),
-                          ShaderLibraryMappingsForPlayground(), true);
-  if (!context) {
-    FML_LOG(ERROR) << "Could not create context.";
-    return nullptr;
-  }
-
-  auto worker_id = context->AddReactorWorker(worker_);
-  if (!worker_id.has_value()) {
-    FML_LOG(ERROR) << "Could not add reactor worker.";
-    return nullptr;
-  }
-  return context;
-}
-
-// |PlaygroundImpl|
-Playground::GLProcAddressResolver
-PlaygroundImplGLES::CreateGLProcAddressResolver() const {
-  return [this](const char* name) -> void* {
-      //return reinterpret_cast<void*>(::glfwGetProcAddress(name));
-      return OnProcResolver(name);
-    };
-}
-
-// |PlaygroundImpl|
-PlaygroundImpl::WindowHandle PlaygroundImplGLES::GetWindowHandle() const {
-  return window_ecore_handle_.get();
-}
-
-// |PlaygroundImpl|
-std::unique_ptr<Surface> PlaygroundImplGLES::AcquireSurfaceFrame(
-    std::shared_ptr<Context> context) {
-
-  EGLint egl_width, egl_height;
-  eglQuerySurface(egl_display_, egl_surface_, EGL_WIDTH, &egl_width);
-  eglQuerySurface(egl_display_, egl_surface_, EGL_HEIGHT, &egl_height);
-
-  int width = (int)egl_width;
-  int height = (int)egl_height;
-
-  if (width <= 0 || height <= 0) {
-    return nullptr;
-  }
-  SurfaceGLES::SwapCallback swap_callback = [this]() -> bool {
-    eglSwapBuffers(egl_display_, egl_surface_);
-    return true;
-  };
-  return SurfaceGLES::WrapFBO(context,                         //
-                              swap_callback,                   //
-                              0u,                              //
-                              PixelFormat::kR8G8B8A8UNormInt,  //
-                              ISize::MakeWH(width, height)     //
-  );
-}
-
-fml::Status PlaygroundImplGLES::SetCapabilities(
-    const std::shared_ptr<Capabilities>& capabilities) {
-  return fml::Status(
-      fml::StatusCode::kUnimplemented,
-      "PlaygroundImplGLES doesn't support setting the capabilities.");
-}
-
-
-bool PlaygroundImplGLES::CreateSurface(void* render_target,
+bool TizenRendererEgl::CreateSurface(void* render_target,
                                      void* render_target_display,
                                      int32_t width,
                                      int32_t height) {
@@ -188,6 +40,7 @@ bool PlaygroundImplGLES::CreateSurface(void* render_target,
   }
 
   if (egl_display_ == EGL_NO_DISPLAY) {
+    PrintEGLError();
     FML_LOG(ERROR) << "Could not get EGL display.";
     return false;
   }
@@ -197,7 +50,7 @@ bool PlaygroundImplGLES::CreateSurface(void* render_target,
     return false;
   }
 
-  eglQueryString(egl_display_, EGL_EXTENSIONS);
+  egl_extension_str_ = eglQueryString(egl_display_, EGL_EXTENSIONS);
 
   {
     const EGLint attribs[] = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE};
@@ -205,6 +58,7 @@ bool PlaygroundImplGLES::CreateSurface(void* render_target,
     egl_context_ =
         eglCreateContext(egl_display_, egl_config_, EGL_NO_CONTEXT, attribs);
     if (egl_context_ == EGL_NO_CONTEXT) {
+      PrintEGLError();
       FML_LOG(ERROR) << "Could not create an onscreen context.";
       return false;
     }
@@ -212,6 +66,7 @@ bool PlaygroundImplGLES::CreateSurface(void* render_target,
     egl_resource_context_ =
         eglCreateContext(egl_display_, egl_config_, egl_context_, attribs);
     if (egl_resource_context_ == EGL_NO_CONTEXT) {
+      PrintEGLError();
       FML_LOG(ERROR) << "Could not create an offscreen context.";
       return false;
     }
@@ -245,10 +100,11 @@ bool PlaygroundImplGLES::CreateSurface(void* render_target,
     }
   }
 
+  is_valid_ = true;
   return true;
 }
 
-void PlaygroundImplGLES::DestroySurface() {
+void TizenRendererEgl::DestroySurface() {
   if (egl_display_) {
     eglMakeCurrent(egl_display_, EGL_NO_SURFACE, EGL_NO_SURFACE,
                    EGL_NO_CONTEXT);
@@ -278,19 +134,22 @@ void PlaygroundImplGLES::DestroySurface() {
   }
 }
 
-bool PlaygroundImplGLES::ChooseEGLConfiguration() {
+bool TizenRendererEgl::ChooseEGLConfiguration() {
   if (!eglInitialize(egl_display_, nullptr, nullptr)) {
+    PrintEGLError();
     FML_LOG(ERROR) << "Could not initialize the EGL display.";
     return false;
   }
 
   if (!eglBindAPI(EGL_OPENGL_ES_API)) {
+    PrintEGLError();
     FML_LOG(ERROR) << "Could not bind the ES API.";
     return false;
   }
 
   EGLint config_size = 0;
   if (!eglGetConfigs(egl_display_, nullptr, 0, &config_size)) {
+    PrintEGLError();
     FML_LOG(ERROR) << "Could not query framebuffer configurations.";
     return false;
   }
@@ -301,27 +160,50 @@ bool PlaygroundImplGLES::ChooseEGLConfiguration() {
     return false;
   }
   EGLint num_config;
-
-  EGLint impeller_config_attribs[] = {
-      // clang-format off
-      EGL_SURFACE_TYPE,    EGL_WINDOW_BIT,
-      EGL_RED_SIZE,        8,
-      EGL_GREEN_SIZE,      8,
-      EGL_BLUE_SIZE,       8,
-      EGL_ALPHA_SIZE,      8,
-      EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-      EGL_SAMPLE_BUFFERS,  1,
-      EGL_SAMPLES,         4,
-      EGL_STENCIL_SIZE,    8,
-      EGL_DEPTH_SIZE,      0,
-      EGL_NONE
-      // clang-format on
-  };
-  if (!eglChooseConfig(egl_display_, impeller_config_attribs, configs,
-                       config_size, &num_config)) {
-    free(configs);
-    FML_LOG(ERROR) << "No matching configurations found.";
-    return false;
+  if (enable_impeller_) {
+    EGLint impeller_config_attribs[] = {
+        // clang-format off
+        EGL_SURFACE_TYPE,    EGL_WINDOW_BIT,
+        EGL_RED_SIZE,        8,
+        EGL_GREEN_SIZE,      8,
+        EGL_BLUE_SIZE,       8,
+        EGL_ALPHA_SIZE,      8,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_SAMPLE_BUFFERS,  1,
+        EGL_SAMPLES,         4,
+        EGL_STENCIL_SIZE,    8,
+        EGL_DEPTH_SIZE,      0,
+        EGL_NONE
+        // clang-format on
+    };
+    if (!eglChooseConfig(egl_display_, impeller_config_attribs, configs,
+                         config_size, &num_config)) {
+      free(configs);
+      PrintEGLError();
+      FML_LOG(ERROR) << "No matching configurations found.";
+      return false;
+    }
+  } else {
+    EGLint config_attribs[] = {
+        // clang-format off
+        EGL_SURFACE_TYPE,    EGL_WINDOW_BIT,
+        EGL_RED_SIZE,        8,
+        EGL_GREEN_SIZE,      8,
+        EGL_BLUE_SIZE,       8,
+        EGL_ALPHA_SIZE,      EGL_DONT_CARE,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_SAMPLE_BUFFERS,  EGL_DONT_CARE,
+        EGL_SAMPLES,         EGL_DONT_CARE,
+        EGL_NONE
+        // clang-format on
+    };
+    if (!eglChooseConfig(egl_display_, config_attribs, configs, config_size,
+                         &num_config)) {
+      free(configs);
+      PrintEGLError();
+      FML_LOG(ERROR) << "No matching configurations found.";
+      return false;
+    }
   }
 
   int buffer_size = 32;
@@ -342,7 +224,103 @@ bool PlaygroundImplGLES::ChooseEGLConfiguration() {
   return true;
 }
 
-void* PlaygroundImplGLES::OnProcResolver(const char* name) const {
+bool TizenRendererEgl::OnMakeCurrent() {
+  if (!IsValid()) {
+    return false;
+  }
+  if (eglMakeCurrent(egl_display_, egl_surface_, egl_surface_, egl_context_) !=
+      EGL_TRUE) {
+    PrintEGLError();
+    FML_LOG(ERROR) << "Could not make the onscreen context current.";
+    return false;
+  }
+  return true;
+}
+
+bool TizenRendererEgl::OnClearCurrent() {
+  if (!IsValid()) {
+    return false;
+  }
+  if (eglMakeCurrent(egl_display_, EGL_NO_SURFACE, EGL_NO_SURFACE,
+                     EGL_NO_CONTEXT) != EGL_TRUE) {
+    PrintEGLError();
+    FML_LOG(ERROR) << "Could not clear the context.";
+    return false;
+  }
+  return true;
+}
+
+bool TizenRendererEgl::OnMakeResourceCurrent() {
+  if (!IsValid()) {
+    return false;
+  }
+  if (eglMakeCurrent(egl_display_, egl_resource_surface_, egl_resource_surface_,
+                     egl_resource_context_) != EGL_TRUE) {
+    PrintEGLError();
+    FML_LOG(ERROR) << "Could not make the offscreen context current.";
+    return false;
+  }
+  return true;
+}
+
+bool TizenRendererEgl::OnPresent() {
+  if (!IsValid()) {
+    return false;
+  }
+
+  if (eglSwapBuffers(egl_display_, egl_surface_) != EGL_TRUE) {
+    PrintEGLError();
+    FML_LOG(ERROR) << "Could not swap EGL buffers.";
+    return false;
+  }
+  return true;
+}
+
+uint32_t TizenRendererEgl::OnGetFBO() {
+  if (!IsValid()) {
+    return 999;
+  }
+  return 0;
+}
+
+void TizenRendererEgl::PrintEGLError() {
+  EGLint error = eglGetError();
+  switch (error) {
+#define CASE_PRINT(value)                     \
+  case value: {                               \
+    FML_LOG(ERROR) << "EGL error: " << #value; \
+    break;                                    \
+  }
+    CASE_PRINT(EGL_NOT_INITIALIZED)
+    CASE_PRINT(EGL_BAD_ACCESS)
+    CASE_PRINT(EGL_BAD_ALLOC)
+    CASE_PRINT(EGL_BAD_ATTRIBUTE)
+    CASE_PRINT(EGL_BAD_CONTEXT)
+    CASE_PRINT(EGL_BAD_CONFIG)
+    CASE_PRINT(EGL_BAD_CURRENT_SURFACE)
+    CASE_PRINT(EGL_BAD_DISPLAY)
+    CASE_PRINT(EGL_BAD_SURFACE)
+    CASE_PRINT(EGL_BAD_MATCH)
+    CASE_PRINT(EGL_BAD_PARAMETER)
+    CASE_PRINT(EGL_BAD_NATIVE_PIXMAP)
+    CASE_PRINT(EGL_BAD_NATIVE_WINDOW)
+    CASE_PRINT(EGL_CONTEXT_LOST)
+#undef CASE_PRINT
+    default: {
+      FML_LOG(ERROR) << "Unknown EGL error: " << error;
+    }
+  }
+}
+
+bool TizenRendererEgl::IsSupportedExtension(const char* name) {
+  return strstr(egl_extension_str_.c_str(), name);
+}
+
+void TizenRendererEgl::ResizeSurface(int32_t width, int32_t height) {
+  // Do nothing.
+}
+
+void* TizenRendererEgl::OnProcResolver(const char* name) {
   auto address = eglGetProcAddress(name);
   if (address != nullptr) {
     return reinterpret_cast<void*>(address);
@@ -471,5 +449,4 @@ void* PlaygroundImplGLES::OnProcResolver(const char* name) const {
   FML_LOG(ERROR) << "Could not resolve: " << name;
   return nullptr;
 }
-
-}  // namespace impeller
+}  // namespace flutter

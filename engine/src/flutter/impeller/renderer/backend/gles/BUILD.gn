@@ -8,7 +8,7 @@ import("../../../tools/impeller.gni")
 config("gles_config") {
   # Generic GL/GLES/EGL/Vulkan headers. Any will do. We just pick one from Angle
   # because they are there.
-  include_dirs = [ "//flutter/third_party/angle/include" ]
+  include_dirs = [ "//flutter/ci/tizen/sysroot/arm/usr/include" ]
 }
 
 impeller_component("gles_unittests") {
@@ -95,11 +95,11 @@ impeller_component("gles") {
   if (!is_android && !is_fuchsia) {
     public_configs = [ ":gles_config" ]
     sources += [
-      "//flutter/third_party/angle/include/GLES2/gl2ext.h",
+      "//flutter/ci/tizen/sysroot/arm/usr/include/GLES2/gl2ext.h",
 
-      # The GLES3 API is a superset of GLES2. Although we target GLES2, we use
-      # some GLES3 features if the driver supports them.
-      "//flutter/third_party/angle/include/GLES3/gl3.h",
+      ## The GLES3 API is a superset of GLES2. Although we target GLES2, we use
+      ## some GLES3 features if the driver supports them.
+      "//flutter/ci/tizen/sysroot/arm/usr/include/GLES3/gl3.h",
     ]
   }
 

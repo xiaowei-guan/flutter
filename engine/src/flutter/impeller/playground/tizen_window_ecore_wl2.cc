@@ -3,12 +3,18 @@
 // found in the LICENSE file.
 
 #include "tizen_window_ecore_wl2.h"
+<<<<<<< HEAD
 
 #include <Ecore_Input.h>
+=======
+#include "flutter/fml/logging.h"
+
+>>>>>>> beb75ae78e (playground test)
 #include <app.h>
 #include <app_preference.h>
 #include <dlfcn.h>
 #include <time.h>
+<<<<<<< HEAD
 #include <tizen-extension-client-protocol.h>
 #include <vconf.h>
 #include <iostream>
@@ -18,6 +24,16 @@ namespace impeller {
 
 namespace {
 
+=======
+#include <vconf.h>
+#include <sstream>
+#include <iostream>
+#include <tizen-extension-client-protocol.h>
+#include <Ecore_Input.h>
+
+namespace impeller {
+
+>>>>>>> beb75ae78e (playground test)
 constexpr int kScrollDirectionVertical = 0;
 constexpr int kScrollDirectionHorizontal = 1;
 
@@ -27,6 +43,10 @@ constexpr char kSysPointingDeviceSupportToastSharedPreferenceKey[] =
     "flutter-tizen/preference/pointing-device-support-toast";
 constexpr char kEcoreWL2InputCursorThemeName[] = "vd-cursors";
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> beb75ae78e (playground test)
 time_t GetBootTimeEpoch() {
   struct timespec now, boot_time;
   if (clock_gettime(CLOCK_REALTIME, &now) != 0) {
@@ -112,7 +132,10 @@ void SetPointingDevicePreference() {
   }
 }
 
+<<<<<<< HEAD
 }  // namespace
+=======
+>>>>>>> beb75ae78e (playground test)
 
 TizenWindowEcoreWl2::TizenWindowEcoreWl2(TizenGeometry geometry,
                                          bool transparent,
@@ -120,7 +143,12 @@ TizenWindowEcoreWl2::TizenWindowEcoreWl2(TizenGeometry geometry,
                                          bool top_level,
                                          bool pointing_device_support,
                                          bool floating_menu_support,
+<<<<<<< HEAD
                                          bool is_vulkan)
+=======
+                                         void* window_handle = nullptr,
+                                         bool is_vulkan = false)
+>>>>>>> beb75ae78e (playground test)
     : initial_geometry_(geometry),
       transparent_(transparent),
       focusable_(focusable),
@@ -128,23 +156,37 @@ TizenWindowEcoreWl2::TizenWindowEcoreWl2(TizenGeometry geometry,
       pointing_device_support_(pointing_device_support),
       floating_menu_support_(floating_menu_support),
       is_vulkan_(is_vulkan) {
+<<<<<<< HEAD
   if (!CreateWindow()) {
+=======
+  if (!CreateWindow(window_handle)) {
+>>>>>>> beb75ae78e (playground test)
     std::cout << "Failed to create a platform window." << std::endl;
     return;
   }
 
   SetWindowOptions();
   RegisterEventHandlers();
+<<<<<<< HEAD
   // PrepareInputMethod();
   Show();
 }  // namespace flutter
+=======
+  //PrepareInputMethod();
+  Show();
+}
+>>>>>>> beb75ae78e (playground test)
 
 TizenWindowEcoreWl2::~TizenWindowEcoreWl2() {
   UnregisterEventHandlers();
   DestroyWindow();
 }
 
+<<<<<<< HEAD
 bool TizenWindowEcoreWl2::CreateWindow() {
+=======
+bool TizenWindowEcoreWl2::CreateWindow(void* window_handle) {
+>>>>>>> beb75ae78e (playground test)
   if (!ecore_wl2_init()) {
     std::cout << "Could not initialize Ecore Wl2." << std::endl;
     return false;
@@ -162,8 +204,12 @@ bool TizenWindowEcoreWl2::CreateWindow() {
   int32_t width, height;
   ecore_wl2_display_screen_size_get(ecore_wl2_display_, &width, &height);
   if (width == 0 || height == 0) {
+<<<<<<< HEAD
     std::cout << "Invalid screen size: " << width << " x " << height
               << std::endl;
+=======
+    std::cout << "Invalid screen size: " << width << " x " << height << std::endl;
+>>>>>>> beb75ae78e (playground test)
     return false;
   }
 
@@ -174,9 +220,20 @@ bool TizenWindowEcoreWl2::CreateWindow() {
     initial_geometry_.height = height;
   }
 
+<<<<<<< HEAD
   ecore_wl2_window_ = ecore_wl2_window_new(
       ecore_wl2_display_, nullptr, initial_geometry_.left,
       initial_geometry_.top, initial_geometry_.width, initial_geometry_.height);
+=======
+  if (window_handle == nullptr) {
+    ecore_wl2_window_ =
+        ecore_wl2_window_new(ecore_wl2_display_, nullptr,
+                             initial_geometry_.left, initial_geometry_.top,
+                             initial_geometry_.width, initial_geometry_.height);
+  } else {
+    ecore_wl2_window_ = static_cast<Ecore_Wl2_Window*>(window_handle);
+  }
+>>>>>>> beb75ae78e (playground test)
 
   if (is_vulkan_) {
     wl2_surface_ = ecore_wl2_window_surface_get(ecore_wl2_window_);
@@ -233,8 +290,12 @@ void TizenWindowEcoreWl2::EnableCursor() {
   // and the relevant headers are not present in the rootstrap.
   void* handle = dlopen("libvd-win-util.so", RTLD_LAZY);
   if (!handle) {
+<<<<<<< HEAD
     std::cout << "Could not open a shared library libvd-win-util.so."
               << std::endl;
+=======
+    std::cout << "Could not open a shared library libvd-win-util.so." << std::endl;
+>>>>>>> beb75ae78e (playground test)
     return;
   }
 
@@ -296,8 +357,12 @@ void TizenWindowEcoreWl2::SetPointingDeviceSupport() {
   // and the relevant headers are not present in the rootstrap.
   void* handle = dlopen("libvd-win-util.so", RTLD_LAZY);
   if (!handle) {
+<<<<<<< HEAD
     std::cout << "Could not open a shared library libvd-win-util.so."
               << std::endl;
+=======
+    std::cout << "Could not open a shared library libvd-win-util.so." << std::endl;
+>>>>>>> beb75ae78e (playground test)
     return;
   }
 
@@ -508,9 +573,16 @@ void TizenWindowEcoreWl2::RegisterEventHandlers() {
               delta_x += wheel_event->z;
             }
 
+<<<<<<< HEAD
             self->view_delegate_->OnScroll(wheel_event->x, wheel_event->y,
                                            delta_x, delta_y,
                                            wheel_event->timestamp, 0);
+=======
+            self->view_delegate_->OnScroll(
+                wheel_event->x, wheel_event->y, delta_x, delta_y,
+                wheel_event->timestamp,
+                0);
+>>>>>>> beb75ae78e (playground test)
             return ECORE_CALLBACK_DONE;
           }
         }
@@ -777,8 +849,14 @@ void TizenWindowEcoreWl2::SetTizenPolicyNotificationLevel(int level) {
   eina_iterator_free(iter);
 
   if (!tizen_policy_) {
+<<<<<<< HEAD
     std::cout << "Failed to initialize the tizen policy handle, the top_level "
                  "attribute is ignored.";
+=======
+    std::cout
+        << "Failed to initialize the tizen policy handle, the top_level "
+           "attribute is ignored.";
+>>>>>>> beb75ae78e (playground test)
     return;
   }
 
@@ -794,4 +872,8 @@ void* TizenWindowEcoreWl2::GetRenderTarget() {
   }
 }
 
+<<<<<<< HEAD
 }  // namespace impeller
+=======
+}
+>>>>>>> beb75ae78e (playground test)

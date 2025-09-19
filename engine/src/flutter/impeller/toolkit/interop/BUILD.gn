@@ -110,7 +110,7 @@ impeller_component("example_gl") {
 
   deps = [
     ":interop",
-    "//flutter/third_party/glfw",
+    #"//flutter/third_party/glfw",
   ]
 }
 
@@ -123,7 +123,7 @@ impeller_component("example_mtl") {
 
   deps = [
     ":interop",
-    "//flutter/third_party/glfw",
+    #"//flutter/third_party/glfw",
   ]
 
   frameworks = [ "QuartzCore.framework" ]
@@ -138,7 +138,7 @@ impeller_component("example_vk") {
 
   deps = [
     ":interop",
-    "//flutter/third_party/glfw",
+    #"//flutter/third_party/glfw",
   ]
 }
 

@@ -34,15 +34,15 @@ config("imgui_headers") {
 }
 
 source_set("imgui_glfw") {
-  public_deps = [
-    ":imgui",
-    "//flutter/third_party/glfw",
-  ]
-
-  public_configs = [ ":imgui_headers" ]
-
-  sources = [
-    "$source_root/backends/imgui_impl_glfw.cpp",
-    "$source_root/backends/imgui_impl_glfw.h",
-  ]
+#  public_deps = [
+#    ":imgui",
+#    "//flutter/third_party/glfw",
+#  ]
+#
+#  public_configs = [ ":imgui_headers" ]
+#
+#  sources = [
+#    "$source_root/backends/imgui_impl_glfw.cpp",
+#    "$source_root/backends/imgui_impl_glfw.h",
+#  ]
 }
