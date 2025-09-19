@@ -11,9 +11,6 @@ impeller_component("playground") {
   include_dirs = [
     "${custom_sysroot}/usr/include/appfw",
     "${custom_sysroot}/usr/include/base",
-    "${custom_sysroot}/usr/include/dali",
-    "${custom_sysroot}/usr/include/dali-adaptor",
-    "${custom_sysroot}/usr/include/dali-toolkit",
     "${custom_sysroot}/usr/include/dlog",
     "${custom_sysroot}/usr/include/ecore-1",
     "${custom_sysroot}/usr/include/ecore-con-1",
@@ -69,7 +66,6 @@ impeller_component("playground") {
       "elementary",
       "evas",
       "feedback",
-      "flutter_engine",
       "tbm",
       "tdm-client",
       "tizen-extension-client",

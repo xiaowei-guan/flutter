@@ -83,6 +83,8 @@ executable("tizen_unittests") {
   #  deps += [ "//flutter/impeller/renderer/backend/gles:gles_unittests" ]
   #}
 
+  ldflags = [ "-Wl,--unresolved-symbols=ignore-in-shared-libs" ]
+
 }
 
 impeller_component("impeller_unittests") {
