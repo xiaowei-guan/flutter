@@ -24,7 +24,8 @@ namespace impeller {
 
 std::unique_ptr<PlaygroundImpl> PlaygroundImpl::Create(
     PlaygroundBackend backend,
-    PlaygroundSwitches switches) {
+    PlaygroundSwitches switches,
+    SharedHandle window_ecore_handle) {
   switch (backend) {
 #if IMPELLER_ENABLE_METAL
     case PlaygroundBackend::kMetal:
@@ -32,7 +33,7 @@ std::unique_ptr<PlaygroundImpl> PlaygroundImpl::Create(
 #endif  // IMPELLER_ENABLE_METAL
 #if IMPELLER_ENABLE_OPENGLES
     case PlaygroundBackend::kOpenGLES:
-      return std::make_unique<PlaygroundImplGLES>(switches, nullptr);
+      return std::make_unique<PlaygroundImplGLES>(switches, std::move(window_ecore_handle));
 #endif  // IMPELLER_ENABLE_OPENGLES
 #if IMPELLER_ENABLE_VULKAN
     case PlaygroundBackend::kVulkan:

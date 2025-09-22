@@ -314,7 +314,9 @@ IMPELLER_DEFINE_HANDLE(ImpellerTexture);
 /// Swapchains are resilient to the underlying surfaces being resized. The
 /// swapchain images will be re-created as necessary on-demand.
 ///
+#if IMPELLER_ENABLE_VULKAN
 IMPELLER_DEFINE_HANDLE(ImpellerVulkanSwapchain);
+#endif
 
 //------------------------------------------------------------------------------
 // Signatures
@@ -344,10 +346,12 @@ typedef void* IMPELLER_NULLABLE (*ImpellerProcAddressCallback)(
 /// pointers. A user supplied baton that is uninterpreted by Impeller is passed
 /// back to the user in the callback.
 ///
+#if IMPELLER_ENABLE_VULKAN
 typedef void* IMPELLER_NULLABLE (*ImpellerVulkanProcAddressCallback)(
     void* IMPELLER_NULLABLE vulkan_instance,
     const char* IMPELLER_NONNULL vulkan_proc_name,
     void* IMPELLER_NULLABLE user_data);
+#endif
 
 //------------------------------------------------------------------------------
 // Enumerations
@@ -605,6 +609,7 @@ typedef struct ImpellerMapping {
   ImpellerCallback IMPELLER_NULLABLE on_release;
 } ImpellerMapping;
 
+#if IMPELLER_ENABLE_VULKAN
 typedef struct ImpellerContextVulkanSettings {
   void* IMPELLER_NULLABLE user_data;
   ImpellerVulkanProcAddressCallback IMPELLER_NONNULL proc_address_callback;
@@ -618,6 +623,7 @@ typedef struct ImpellerContextVulkanInfo {
   uint32_t graphics_queue_family_index;
   uint32_t graphics_queue_index;
 } ImpellerContextVulkanInfo;
+#endif
 
 //------------------------------------------------------------------------------
 // Version
@@ -700,10 +706,12 @@ ImpellerContextCreateMetalNew(uint32_t version);
 ///
 /// @return     The Vulkan context or NULL if one cannot be created.
 ///
+#if IMPELLER_ENABLE_VULKAN
 IMPELLER_EXPORT IMPELLER_NODISCARD ImpellerContext IMPELLER_NULLABLE
 ImpellerContextCreateVulkanNew(
     uint32_t version,
     const ImpellerContextVulkanSettings* IMPELLER_NONNULL settings);
+#endif
 
 //------------------------------------------------------------------------------
 /// @brief      Retain a strong reference to the object. The object can be NULL
@@ -737,10 +745,12 @@ void ImpellerContextRelease(ImpellerContext IMPELLER_NULLABLE context);
 ///
 /// @return     If the Vulkan info could be fetched from the context.
 ///
+#if IMPELLER_ENABLE_VULKAN
 IMPELLER_EXPORT
 bool ImpellerContextGetVulkanInfo(
     ImpellerContext IMPELLER_NONNULL context,
     ImpellerContextVulkanInfo* IMPELLER_NONNULL out_vulkan_info);
+#endif
 
 //------------------------------------------------------------------------------
 // Vulkan Swapchain
@@ -759,6 +769,7 @@ bool ImpellerContextGetVulkanInfo(
 ///
 /// @return     The vulkan swapchain.
 ///
+#if IMPELLER_ENABLE_VULKAN
 IMPELLER_EXPORT IMPELLER_NODISCARD ImpellerVulkanSwapchain IMPELLER_NULLABLE
 ImpellerVulkanSwapchainCreateNew(ImpellerContext IMPELLER_NONNULL context,
                                  void* IMPELLER_NONNULL vulkan_surface_khr);
@@ -796,6 +807,7 @@ void ImpellerVulkanSwapchainRelease(
 IMPELLER_EXPORT IMPELLER_NODISCARD ImpellerSurface IMPELLER_NULLABLE
 ImpellerVulkanSwapchainAcquireNextSurfaceNew(
     ImpellerVulkanSwapchain IMPELLER_NONNULL swapchain);
+#endif
 
 //------------------------------------------------------------------------------
 // Surface

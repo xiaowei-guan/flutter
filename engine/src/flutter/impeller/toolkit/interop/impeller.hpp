@@ -58,8 +58,6 @@ struct Proc {
   PROC(ImpellerColorSourceRetain)                                 \
   PROC(ImpellerContextCreateMetalNew)                             \
   PROC(ImpellerContextCreateOpenGLESNew)                          \
-  PROC(ImpellerContextCreateVulkanNew)                            \
-  PROC(ImpellerContextGetVulkanInfo)                              \
   PROC(ImpellerContextRelease)                                    \
   PROC(ImpellerContextRetain)                                     \
   PROC(ImpellerDisplayListBuilderClipOval)                        \
@@ -208,11 +206,7 @@ struct Proc {
   PROC(ImpellerTypographyContextNew)                              \
   PROC(ImpellerTypographyContextRegisterFont)                     \
   PROC(ImpellerTypographyContextRelease)                          \
-  PROC(ImpellerTypographyContextRetain)                           \
-  PROC(ImpellerVulkanSwapchainAcquireNextSurfaceNew)              \
-  PROC(ImpellerVulkanSwapchainCreateNew)                          \
-  PROC(ImpellerVulkanSwapchainRelease)                            \
-  PROC(ImpellerVulkanSwapchainRetain)
+  PROC(ImpellerTypographyContextRetain)
 
 struct ProcTable {
   bool Initialize(
@@ -322,7 +316,9 @@ IMPELLER_HPP_DEFINE_TRAITS(ImpellerPathBuilder);
 IMPELLER_HPP_DEFINE_TRAITS(ImpellerSurface);
 IMPELLER_HPP_DEFINE_TRAITS(ImpellerTexture);
 IMPELLER_HPP_DEFINE_TRAITS(ImpellerTypographyContext);
+#if IMPELLER_ENABLE_VULKAN
 IMPELLER_HPP_DEFINE_TRAITS(ImpellerVulkanSwapchain);
+#endif
 
 #undef IMPELLER_HPP_DEFINE_TRAITS
 
@@ -377,9 +373,11 @@ class Context final : public Object<ImpellerContext, ImpellerContextTraits> {
   //----------------------------------------------------------------------------
   /// @see      ImpellerContextGetVulkanInfo
   ///
+  #if IMPELLER_ENABLE_VULKAN
   bool GetVulkanInfo(ImpellerContextVulkanInfo& info) const {
     return gGlobalProcTable.ImpellerContextGetVulkanInfo(Get(), &info);
   }
+  #endif
 };
 
 //------------------------------------------------------------------------------
@@ -1391,6 +1389,7 @@ class Surface final : public Object<ImpellerSurface, ImpellerSurfaceTraits> {
 //------------------------------------------------------------------------------
 /// @see      ImpellerVulkanSwapchain
 ///
+#if IMPELLER_ENABLE_VULKAN
 class VulkanSwapchain final
     : public Object<ImpellerVulkanSwapchain, ImpellerVulkanSwapchainTraits> {
  public:
@@ -1416,6 +1415,7 @@ class VulkanSwapchain final
         AdoptTag::kAdopt);
   }
 };
+#endif
 
 //------------------------------------------------------------------------------
 /// @see      ImpellerDisplayListBuilder

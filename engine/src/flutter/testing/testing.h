@@ -29,6 +29,8 @@ const char* GetSourcePath();
 ///
 const char* GetFixturesPath();
 
+const char* GetFixturesPathOG();
+
 //------------------------------------------------------------------------------
 /// @brief      Returns the directory containing assets shared across all tests.
 ///

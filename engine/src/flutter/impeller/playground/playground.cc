@@ -130,7 +130,7 @@ void Playground::SetupContext(PlaygroundBackend backend,
                               const PlaygroundSwitches& switches) {
   FML_CHECK(SupportsBackend(backend));
 
-  impl_ = PlaygroundImpl::Create(backend, switches);
+  impl_ = PlaygroundImpl::Create(backend, switches, std::move(tizen_window_));
   if (!impl_) {
     FML_LOG(WARNING) << "PlaygroundImpl::Create failed.";
     return;

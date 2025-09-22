@@ -17,7 +17,7 @@ namespace impeller {
 
 class PlaygroundImpl {
  public:
-  static std::unique_ptr<PlaygroundImpl> Create(PlaygroundBackend backend,PlaygroundSwitches switches);
+  static std::unique_ptr<PlaygroundImpl> Create(PlaygroundBackend backend,PlaygroundSwitches switches, SharedHandle window_ecore_handle);
 
   virtual ~PlaygroundImpl();
 

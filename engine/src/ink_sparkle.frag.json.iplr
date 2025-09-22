@@ -1,0 +1,498 @@
+{
+  "metal": {
+    "entrypoint": "ink_sparkle_fragment_main",
+    "shader": "#pragma clang diagnostic ignored \"-Wmissing-prototypes\"\n\n#include <metal_stdlib>\n#include <simd/simd.h>\n\nusing namespace metal;\n\n// Implementation of the GLSL mod() function, which is slightly different than Metal fmod()\ntemplate<typename Tx, typename Ty>\ninline Tx mod(Tx x, Ty y)\n{\n    return x - y * floor(x / y);\n}\n\nstruct ink_sparkle_fragment_main_out\n{\n    float4 fragColor [[color(0)]];\n};\n\nstruct ink_sparkle_fragment_main_in\n{\n    float2 _fragCoord [[user(locn0)]];\n};\n\nfragment ink_sparkle_fragment_main_out ink_sparkle_fragment_main(ink_sparkle_fragment_main_in in [[stage_in]], constant float4& u_color [[buffer(0)]], constant float& u_alpha [[buffer(1)]], constant float4& u_sparkle_color [[buffer(2)]], constant float& u_sparkle_alpha [[buffer(3)]], constant float& u_blur [[buffer(4)]], constant float2& u_center [[buffer(5)]], constant float& u_radius_scale [[buffer(6)]], constant float& u_max_radius [[buffer(7)]], constant float2& u_resolution_scale [[buffer(8)]], constant float2& u_noise_scale [[buffer(9)]], constant float& u_noise_phase [[buffer(10)]], constant float2& u_circle1 [[buffer(11)]], constant float2& u_circle2 [[buffer(12)]], constant float2& u_circle3 [[buffer(13)]], constant float2& u_rotation1 [[buffer(14)]], constant float2& u_rotation2 [[buffer(15)]], constant float2& u_rotation3 [[buffer(16)]])\n{\n    ink_sparkle_fragment_main_out out = {};\n    float2 _347 = in._fragCoord * u_resolution_scale;\n    float _361 = u_max_radius * u_radius_scale;\n    float2 _476 = _347 * float2(0.800000011920928955078125);\n    float _570 = 1.0 - smoothstep(-0.7265625, 2.7265625, distance(mod((float2x2(float2(u_rotation1.x, -u_rotation1.y), float2(u_rotation1.yx)) * (u_circle1 - _476)) + u_circle1, float2(0.17000000178813934326171875)) * float2(1.25), float2(0.10625000298023223876953125)) * 14.47963809967041015625);\n    float _369 = 0.0500000007450580596923828125 * u_max_radius;\n    float _745 = u_blur * 0.5;\n    float _748 = distance(in._fragCoord, u_center);\n    float _750 = 1.0 - _745;\n    float _752 = 1.0 + _745;\n    float2 _832 = fract((_347 - mod(in._fragCoord, u_noise_scale)) * float2(5.398700237274169921875, 5.442100048065185546875));\n    float2 _840 = _832 + float2(dot(_832.yx, _832 + float2(21.5351009368896484375, 14.3136997222900390625)));\n    float _845 = _840.x * _840.y;\n    float _853 = (fract(_845 * 95.43070220947265625) + fract(_845 * 75.0496063232421875)) - 1.0;\n    float _802 = _853 + sin(3.1415927410125732421875 * (u_noise_phase + 0.3499999940395355224609375));\n    float _811 = _853 + sin(3.1415927410125732421875 * (u_noise_phase + 0.699999988079071044921875));\n    float _820 = _853 + sin(3.1415927410125732421875 * (u_noise_phase + 1.0499999523162841796875));\n    float _394 = (((fast::clamp((((step(0.0, _853) * (1.0 - step(0.0500000007450580596923828125, _853))) + (step(0.100000001490116119384765625, _802) * (1.0 - step(0.1500000059604644775390625, _802)))) + (step(0.20000000298023223876953125, _811) * (1.0 - step(0.25, _811)))) + (step(0.300000011920928955078125, _820) * (1.0 - step(0.3499999940395355224609375, _820))), 0.0, 1.0) * 0.550000011920928955078125) * fast::clamp((1.0 - smoothstep(_750, _752, _748 / (_361 + _369))) - (1.0 - smoothstep(_750, _752, _748 / fast::max(_361 - _369, 0.0))), 0.0, 1.0)) * fast::clamp(0.449999988079071044921875 + ((((_570 * _570) + (1.0 - smoothstep(-1.03125, 3.03125, distance(mod((float2x2(float2(u_rotation2.x, -u_rotation2.y), float2(u_rotation2.yx)) * (u_circle2 - _476)) + u_circle2, float2(0.20000000298023223876953125)) * float2(1.25), float2(0.125)) * 12.30769252777099609375))) - (1.0 - smoothstep(-1.7929685115814208984375, 3.7929685115814208984375, distance(mod((float2x2(float2(u_rotation3.x, -u_rotation3.y), float2(u_rotation3.yx)) * (u_circle3 - _476)) + u_circle3, float2(0.2750000059604644775390625)) * float2(1.25), float2(0.171875)) * 8.9510498046875))) * 0.4000000059604644775390625), 0.0, 1.0)) * u_sparkle_alpha;\n    float _414 = ((1.0 - smoothstep(_750, _752, _748 / _361)) * u_alpha) * u_color.w;\n    out.fragColor = mix(float4(u_color.xyz * _414, _414), float4(u_sparkle_color.xyz * u_sparkle_color.w, u_sparkle_color.w), float4(_394));\n    return out;\n}\n\n",
+    "stage": 1,
+    "uniforms": [
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 0,
+        "name": "u_color",
+        "rows": 4,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 1,
+        "name": "u_alpha",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 2,
+        "name": "u_sparkle_color",
+        "rows": 4,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 3,
+        "name": "u_sparkle_alpha",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 4,
+        "name": "u_blur",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 5,
+        "name": "u_center",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 6,
+        "name": "u_radius_scale",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 7,
+        "name": "u_max_radius",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 8,
+        "name": "u_resolution_scale",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 9,
+        "name": "u_noise_scale",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 10,
+        "name": "u_noise_phase",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 11,
+        "name": "u_circle1",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 12,
+        "name": "u_circle2",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 13,
+        "name": "u_circle3",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 14,
+        "name": "u_rotation1",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 15,
+        "name": "u_rotation2",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 16,
+        "name": "u_rotation3",
+        "rows": 2,
+        "type": 10
+      }
+    ]
+  },
+  "opengles": {
+    "entrypoint": "ink_sparkle_fragment_main",
+    "shader": "#version 100\nprecision mediump float;\nprecision highp int;\n\nuniform highp vec2 u_circle1;\nuniform highp vec2 u_rotation1;\nuniform highp vec2 u_circle2;\nuniform highp vec2 u_rotation2;\nuniform highp vec2 u_circle3;\nuniform highp vec2 u_rotation3;\nuniform highp vec2 u_resolution_scale;\nuniform highp vec2 u_noise_scale;\nuniform highp float u_max_radius;\nuniform highp float u_radius_scale;\nuniform highp vec2 u_center;\nuniform highp float u_blur;\nuniform highp float u_noise_phase;\nuniform highp float u_sparkle_alpha;\nuniform highp float u_alpha;\nuniform highp vec4 u_color;\nuniform highp vec4 u_sparkle_color;\n\nvarying highp vec2 _fragCoord;\n\nvoid main()\n{\n    highp vec2 _347 = _fragCoord * u_resolution_scale;\n    highp float _361 = u_max_radius * u_radius_scale;\n    highp vec2 _476 = _347 * vec2(0.800000011920928955078125);\n    highp float _570 = 1.0 - smoothstep(-0.7265625, 2.7265625, distance(mod((mat2(vec2(u_rotation1.x, -u_rotation1.y), vec2(u_rotation1.yx)) * (u_circle1 - _476)) + u_circle1, vec2(0.17000000178813934326171875)) * vec2(1.25), vec2(0.10625000298023223876953125)) * 14.47963809967041015625);\n    highp float _369 = 0.0500000007450580596923828125 * u_max_radius;\n    highp float _745 = u_blur * 0.5;\n    highp float _748 = distance(_fragCoord, u_center);\n    highp float _750 = 1.0 - _745;\n    highp float _752 = 1.0 + _745;\n    highp vec2 _832 = fract((_347 - mod(_fragCoord, u_noise_scale)) * vec2(5.398700237274169921875, 5.442100048065185546875));\n    highp vec2 _840 = _832 + vec2(dot(_832.yx, _832 + vec2(21.5351009368896484375, 14.3136997222900390625)));\n    highp float _845 = _840.x * _840.y;\n    highp float _853 = (fract(_845 * 95.43070220947265625) + fract(_845 * 75.0496063232421875)) - 1.0;\n    highp float _802 = _853 + sin(3.1415927410125732421875 * (u_noise_phase + 0.3499999940395355224609375));\n    highp float _811 = _853 + sin(3.1415927410125732421875 * (u_noise_phase + 0.699999988079071044921875));\n    highp float _820 = _853 + sin(3.1415927410125732421875 * (u_noise_phase + 1.0499999523162841796875));\n    highp float _394 = (((clamp((((step(0.0, _853) * (1.0 - step(0.0500000007450580596923828125, _853))) + (step(0.100000001490116119384765625, _802) * (1.0 - step(0.1500000059604644775390625, _802)))) + (step(0.20000000298023223876953125, _811) * (1.0 - step(0.25, _811)))) + (step(0.300000011920928955078125, _820) * (1.0 - step(0.3499999940395355224609375, _820))), 0.0, 1.0) * 0.550000011920928955078125) * clamp((1.0 - smoothstep(_750, _752, _748 / (_361 + _369))) - (1.0 - smoothstep(_750, _752, _748 / max(_361 - _369, 0.0))), 0.0, 1.0)) * clamp(0.449999988079071044921875 + ((((_570 * _570) + (1.0 - smoothstep(-1.03125, 3.03125, distance(mod((mat2(vec2(u_rotation2.x, -u_rotation2.y), vec2(u_rotation2.yx)) * (u_circle2 - _476)) + u_circle2, vec2(0.20000000298023223876953125)) * vec2(1.25), vec2(0.125)) * 12.30769252777099609375))) - (1.0 - smoothstep(-1.7929685115814208984375, 3.7929685115814208984375, distance(mod((mat2(vec2(u_rotation3.x, -u_rotation3.y), vec2(u_rotation3.yx)) * (u_circle3 - _476)) + u_circle3, vec2(0.2750000059604644775390625)) * vec2(1.25), vec2(0.171875)) * 8.9510498046875))) * 0.4000000059604644775390625), 0.0, 1.0)) * u_sparkle_alpha;\n    highp float _414 = ((1.0 - smoothstep(_750, _752, _748 / _361)) * u_alpha) * u_color.w;\n    gl_FragData[0] = mix(vec4(u_color.xyz * _414, _414), vec4(u_sparkle_color.xyz * u_sparkle_color.w, u_sparkle_color.w), vec4(_394));\n}\n\n",
+    "stage": 1,
+    "uniforms": [
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 0,
+        "name": "u_color",
+        "rows": 4,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 1,
+        "name": "u_alpha",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 2,
+        "name": "u_sparkle_color",
+        "rows": 4,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 3,
+        "name": "u_sparkle_alpha",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 4,
+        "name": "u_blur",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 5,
+        "name": "u_center",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 6,
+        "name": "u_radius_scale",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 7,
+        "name": "u_max_radius",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 8,
+        "name": "u_resolution_scale",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 9,
+        "name": "u_noise_scale",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 10,
+        "name": "u_noise_phase",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 11,
+        "name": "u_circle1",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 12,
+        "name": "u_circle2",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 13,
+        "name": "u_circle3",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 14,
+        "name": "u_rotation1",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 15,
+        "name": "u_rotation2",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 16,
+        "name": "u_rotation3",
+        "rows": 2,
+        "type": 10
+      }
+    ]
+  },
+  "sksl": {
+    "entrypoint": "ink_sparkle_fragment_main",
+    "shader": "// This SkSL shader is autogenerated by spirv-cross.\n\nfloat4 flutter_FragCoord;\n\nuniform vec4 u_color;\nuniform float u_alpha;\nuniform vec4 u_sparkle_color;\nuniform float u_sparkle_alpha;\nuniform float u_blur;\nuniform vec2 u_center;\nuniform float u_radius_scale;\nuniform float u_max_radius;\nuniform vec2 u_resolution_scale;\nuniform vec2 u_noise_scale;\nuniform float u_noise_phase;\nuniform vec2 u_circle1;\nuniform vec2 u_circle2;\nuniform vec2 u_circle3;\nuniform vec2 u_rotation1;\nuniform vec2 u_rotation2;\nuniform vec2 u_rotation3;\n\nvec4 fragColor;\n\nvec2 FLT_flutter_local_FlutterFragCoord()\n{\n    return flutter_FragCoord.xy;\n}\n\nmat2 FLT_flutter_local_rotate2d(vec2 rad)\n{\n    return mat2(vec2(rad.x, -rad.y), vec2(rad.y, rad.x));\n}\n\nfloat FLT_flutter_local_soft_circle(vec2 uv, vec2 xy, float radius, float blur)\n{\n    float blur_half = blur * 0.5;\n    float d = distance(uv, xy);\n    return 1.0 - smoothstep(1.0 - blur_half, 1.0 + blur_half, d / radius);\n}\n\nfloat FLT_flutter_local_circle_grid(vec2 resolution, inout vec2 p, vec2 xy, vec2 rotation, float cell_diameter)\n{\n    vec2 param = rotation;\n    p = (FLT_flutter_local_rotate2d(param) * (xy - p)) + xy;\n    p = mod(p, vec2(cell_diameter)) / resolution;\n    float cell_uv = (cell_diameter / resolution.y) * 0.5;\n    float r = 0.64999997615814208984375 * cell_uv;\n    vec2 param_1 = p;\n    vec2 param_2 = vec2(cell_uv);\n    float param_3 = r;\n    float param_4 = r * 50.0;\n    return FLT_flutter_local_soft_circle(param_1, param_2, param_3, param_4);\n}\n\nfloat FLT_flutter_local_turbulence(vec2 uv)\n{\n    vec2 uv_scale = uv * vec2(0.800000011920928955078125);\n    vec2 param = vec2(0.800000011920928955078125);\n    vec2 param_1 = uv_scale;\n    vec2 param_2 = u_circle1;\n    vec2 param_3 = u_rotation1;\n    float param_4 = 0.17000000178813934326171875;\n    float _301 = FLT_flutter_local_circle_grid(param, param_1, param_2, param_3, param_4);\n    float g1 = _301;\n    vec2 param_5 = vec2(0.800000011920928955078125);\n    vec2 param_6 = uv_scale;\n    vec2 param_7 = u_circle2;\n    vec2 param_8 = u_rotation2;\n    float param_9 = 0.20000000298023223876953125;\n    float _313 = FLT_flutter_local_circle_grid(param_5, param_6, param_7, param_8, param_9);\n    float g2 = _313;\n    vec2 param_10 = vec2(0.800000011920928955078125);\n    vec2 param_11 = uv_scale;\n    vec2 param_12 = u_circle3;\n    vec2 param_13 = u_rotation3;\n    float param_14 = 0.2750000059604644775390625;\n    float _326 = FLT_flutter_local_circle_grid(param_10, param_11, param_12, param_13, param_14);\n    float g3 = _326;\n    float v = (((g1 * g1) + g2) - g3) * 0.5;\n    return clamp(0.449999988079071044921875 + (0.800000011920928955078125 * v), 0.0, 1.0);\n}\n\nfloat FLT_flutter_local_soft_ring(vec2 uv, vec2 xy, float radius, float thickness, float blur)\n{\n    vec2 param = uv;\n    vec2 param_1 = xy;\n    float param_2 = radius + thickness;\n    float param_3 = blur;\n    float circle_outer = FLT_flutter_local_soft_circle(param, param_1, param_2, param_3);\n    vec2 param_4 = uv;\n    vec2 param_5 = xy;\n    float param_6 = max(radius - thickness, 0.0);\n    float param_7 = blur;\n    float circle_inner = FLT_flutter_local_soft_circle(param_4, param_5, param_6, param_7);\n    return clamp(circle_outer - circle_inner, 0.0, 1.0);\n}\n\nfloat FLT_flutter_local_triangle_noise(inout vec2 n)\n{\n    n = fract(n * vec2(5.398700237274169921875, 5.442100048065185546875));\n    n += vec2(dot(n.yx, n + vec2(21.5351009368896484375, 14.3136997222900390625)));\n    float xy = n.x * n.y;\n    return (fract(xy * 95.43070220947265625) + fract(xy * 75.0496063232421875)) - 1.0;\n}\n\nfloat FLT_flutter_local_threshold(float v, float l, float h)\n{\n    return step(l, v) * (1.0 - step(h, v));\n}\n\nfloat FLT_flutter_local_sparkle(vec2 uv, float t)\n{\n    vec2 param = uv;\n    float _224 = FLT_flutter_local_triangle_noise(param);\n    float n = _224;\n    float param_1 = n;\n    float param_2 = 0.0;\n    float param_3 = 0.0500000007450580596923828125;\n    float s = FLT_flutter_local_threshold(param_1, param_2, param_3);\n    float param_4 = n + sin(3.1415927410125732421875 * (t + 0.3499999940395355224609375));\n    float param_5 = 0.100000001490116119384765625;\n    float param_6 = 0.1500000059604644775390625;\n    s += FLT_flutter_local_threshold(param_4, param_5, param_6);\n    float param_7 = n + sin(3.1415927410125732421875 * (t + 0.699999988079071044921875));\n    float param_8 = 0.20000000298023223876953125;\n    float param_9 = 0.25;\n    s += FLT_flutter_local_threshold(param_7, param_8, param_9);\n    float param_10 = n + sin(3.1415927410125732421875 * (t + 1.0499999523162841796875));\n    float param_11 = 0.300000011920928955078125;\n    float param_12 = 0.3499999940395355224609375;\n    s += FLT_flutter_local_threshold(param_10, param_11, param_12);\n    return clamp(s, 0.0, 1.0) * 0.550000011920928955078125;\n}\n\nvoid FLT_main()\n{\n    vec2 p = FLT_flutter_local_FlutterFragCoord();\n    vec2 uv_1 = p * u_resolution_scale;\n    vec2 density_uv = uv_1 - mod(p, u_noise_scale);\n    float radius = u_max_radius * u_radius_scale;\n    vec2 param_13 = uv_1;\n    float turbulence = FLT_flutter_local_turbulence(param_13);\n    vec2 param_14 = p;\n    vec2 param_15 = u_center;\n    float param_16 = radius;\n    float param_17 = 0.0500000007450580596923828125 * u_max_radius;\n    float param_18 = u_blur;\n    float ring = FLT_flutter_local_soft_ring(param_14, param_15, param_16, param_17, param_18);\n    vec2 param_19 = density_uv;\n    float param_20 = u_noise_phase;\n    float sparkle = ((FLT_flutter_local_sparkle(param_19, param_20) * ring) * turbulence) * u_sparkle_alpha;\n    vec2 param_21 = p;\n    vec2 param_22 = u_center;\n    float param_23 = radius;\n    float param_24 = u_blur;\n    float wave_alpha = (FLT_flutter_local_soft_circle(param_21, param_22, param_23, param_24) * u_alpha) * u_color.w;\n    vec4 wave_color = vec4(u_color.xyz * wave_alpha, wave_alpha);\n    vec4 sparkle_color = vec4(u_sparkle_color.xyz * u_sparkle_color.w, u_sparkle_color.w);\n    fragColor = mix(wave_color, sparkle_color, vec4(sparkle));\n}\n\nhalf4 main(float2 iFragCoord)\n{\n      flutter_FragCoord = float4(iFragCoord, 0, 0);\n      FLT_main();\n      return fragColor;\n}\n",
+    "stage": 1,
+    "uniforms": [
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 0,
+        "name": "u_color",
+        "rows": 4,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 1,
+        "name": "u_alpha",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 2,
+        "name": "u_sparkle_color",
+        "rows": 4,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 3,
+        "name": "u_sparkle_alpha",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 4,
+        "name": "u_blur",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 5,
+        "name": "u_center",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 6,
+        "name": "u_radius_scale",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 7,
+        "name": "u_max_radius",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 8,
+        "name": "u_resolution_scale",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 9,
+        "name": "u_noise_scale",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 10,
+        "name": "u_noise_phase",
+        "rows": 1,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 11,
+        "name": "u_circle1",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 12,
+        "name": "u_circle2",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 13,
+        "name": "u_circle3",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 14,
+        "name": "u_rotation1",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 15,
+        "name": "u_rotation2",
+        "rows": 2,
+        "type": 10
+      },
+      {
+        "array_elements": 0,
+        "bit_width": 32,
+        "columns": 1,
+        "location": 16,
+        "name": "u_rotation3",
+        "rows": 2,
+        "type": 10
+      }
+    ]
+  },
+  "vulkan": {
+    "entrypoint": "ink_sparkle_fragment_main",
+    "shader": "\u0003\u0002#\u0007",
+    "stage": 1,
+    "uniforms": [
+      {
+        "array_elements": 0,
+        "bit_width": 0,
+        "columns": 0,
+        "location": 64,
+        "name": "_RESERVED_IDENTIFIER_FIXUP_gl_DefaultUniformBlock",
+        "rows": 0,
+        "type": 13
+      }
+    ]
+  }
+}

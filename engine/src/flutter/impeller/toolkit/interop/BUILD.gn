@@ -129,18 +129,18 @@ impeller_component("example_mtl") {
   frameworks = [ "QuartzCore.framework" ]
 }
 
-impeller_component("example_vk") {
-  target_type = "executable"
-
-  output_name = "impeller_interop_example_vk"
-
-  sources = [ "example_vk.c" ]
-
-  deps = [
-    ":interop",
-    #"//flutter/third_party/glfw",
-  ]
-}
+#impeller_component("example_vk") {
+#  target_type = "executable"
+#
+#  output_name = "impeller_interop_example_vk"
+#
+#  sources = [ "example_vk.c" ]
+#
+#  deps = [
+#    ":interop",
+#    #"//flutter/third_party/glfw",
+#  ]
+#}
 
 group("example") {
   deps = []
@@ -152,9 +152,9 @@ group("example") {
     deps += [ ":example_mtl" ]
   }
 
-  if (impeller_enable_vulkan) {
-    deps += [ ":example_vk" ]
-  }
+  #if (impeller_enable_vulkan) {
+  #  deps += [ ":example_vk" ]
+  #}
 }
 
 impeller_component("interop_unittests") {
@@ -202,10 +202,10 @@ zip_bundle("sdk") {
       source = "example_gl.c"
       destination = "examples/example_gl.c"
     },
-    {
-      source = "example_vk.c"
-      destination = "examples/example_vk.c"
-    },
+    #{
+    #  source = "example_vk.c"
+    #  destination = "examples/example_vk.c"
+    #},
     {
       source = "example_mtl.m"
       destination = "examples/example_mtl.m"

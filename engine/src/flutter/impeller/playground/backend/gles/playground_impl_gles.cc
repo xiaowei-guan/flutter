@@ -68,7 +68,9 @@ PlaygroundImplGLES::PlaygroundImplGLES(PlaygroundSwitches switches, SharedHandle
     : PlaygroundImpl(switches),
       worker_(std::shared_ptr<ReactorWorker>(new ReactorWorker())) {
 
-  window_ecore_handle_ = window_ecore_handle;
+  window_ecore_handle_ = std::move(window_ecore_handle);
+  std::string is_null = window_ecore_handle_ == nullptr ? "true" : "false";
+  std::cout << "********window_ecore_handle_ is null ?? " << is_null << std::endl;
   TizenGeometry geometry = window_ecore_handle_->GetGeometry();
   CreateSurface(window_ecore_handle_->GetRenderTarget(),
                          window_ecore_handle_->GetRenderTargetDisplay(), geometry.width,
@@ -218,33 +220,33 @@ bool PlaygroundImplGLES::CreateSurface(void* render_target,
     }
   }
 
-  {
-    const EGLint attribs[] = {EGL_NONE};
+  // {
+  //   const EGLint attribs[] = {EGL_NONE};
 
-    if (render_target_display) {
-      auto* egl_window =
-          static_cast<EGLNativeWindowType*>(ecore_wl2_egl_window_native_get(
-              static_cast<Ecore_Wl2_Egl_Window*>(render_target)));
-      egl_surface_ = eglCreateWindowSurface(egl_display_, egl_config_,
-                                            *egl_window, attribs);
-    }
+  //   if (render_target_display) {
+  //     auto* egl_window =
+  //         static_cast<EGLNativeWindowType*>(ecore_wl2_egl_window_native_get(
+  //             static_cast<Ecore_Wl2_Egl_Window*>(render_target)));
+  //     egl_surface_ = eglCreateWindowSurface(egl_display_, egl_config_,
+  //                                           *egl_window, attribs);
+  //   }
 
-    if (egl_surface_ == EGL_NO_SURFACE) {
-      FML_LOG(ERROR) << "Could not create an onscreen window surface.";
-      return false;
-    }
-  }
+  //   if (egl_surface_ == EGL_NO_SURFACE) {
+  //     std::cout << "Could not create an onscreen window surface." << std::endl;
+  //     return false;
+  //   }
+  // }
 
-  {
-    const EGLint attribs[] = {EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE};
+  // {
+  //   const EGLint attribs[] = {EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE};
 
-    egl_resource_surface_ =
-        eglCreatePbufferSurface(egl_display_, egl_config_, attribs);
-    if (egl_resource_surface_ == EGL_NO_SURFACE) {
-      FML_LOG(ERROR) << "Could not create an offscreen window surface.";
-      return false;
-    }
-  }
+  //   egl_resource_surface_ =
+  //       eglCreatePbufferSurface(egl_display_, egl_config_, attribs);
+  //   if (egl_resource_surface_ == EGL_NO_SURFACE) {
+  //     std::cout << "Could not create an offscreen window surface." << std::endl;
+  //     return false;
+  //   }
+  // }
 
   return true;
 }

@@ -23,6 +23,8 @@
 
 namespace impeller {
 
+using SharedHandle = std::shared_ptr<TizenWindowEcoreWl2>;
+
 class PlaygroundImpl;
 
 enum class PlaygroundBackend {

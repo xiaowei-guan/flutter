@@ -5,9 +5,7 @@
 import("//flutter/impeller/tools/impeller.gni")
 import("//flutter/testing/testing.gni")
 
-
-impeller_component("playground") {
-  testonly = true
+config("playground_config") {
   include_dirs = [
     "${custom_sysroot}/usr/include/appfw",
     "${custom_sysroot}/usr/include/base",
@@ -44,37 +42,44 @@ impeller_component("playground") {
     "${custom_sysroot}/usr/include/wayland-extension",
   ]
   libs = [
-      "base-utils-i18n",
-      "capi-appfw-application",
-      "capi-appfw-app-common",
-      "capi-appfw-app-control",
-      "capi-appfw-preference",
-      "capi-base-common",
-      "capi-system-info",
-      "capi-system-system-settings",
-      "capi-ui-efl-util",
-      "dlog",
-      "ecore",
-      "ecore_evas",
-      "ecore_imf",
-      "ecore_imf_evas",
-      "ecore_input",
-      "ecore_wl2",
-      "efl-extension",
-      "eina",
-      "eldbus",
-      "elementary",
-      "evas",
-      "feedback",
-      "tbm",
-      "tdm-client",
-      "tizen-extension-client",
-      "vconf",
-      "vulkan",
-      "wayland-client",
-      "EGL",
-      "GLESv2",
+    #"base-utils-i18n",
+    "capi-appfw-application",
+    "capi-appfw-app-common",
+    "capi-appfw-app-control",
+    "capi-appfw-preference",
+    #"capi-base-common",
+    #"capi-system-info",
+    #"capi-system-system-settings",
+    #"capi-ui-efl-util",
+    #"dlog",
+    "ecore",
+    #"ecore_evas",
+    #"ecore_imf",
+    #"ecore_imf_evas",
+    "ecore_input",
+    "ecore_wl2",
+    #"efl-extension",
+    "eina",
+    #"eldbus",
+    #"elementary",
+    #"evas",
+    #"feedback",
+    "tbm",
+    #"tdm-client",
+    "tizen-extension-client",
+    "vconf",
+    #"vulkan",
+    "wayland-client",
+    "EGL",
+    "GLESv2",
     ]
+}
+
+
+impeller_component("playground") {
+  testonly = true
+  
+  public_configs = [ ":playground_config" ]
 
   sources = [
     "playground.cc",

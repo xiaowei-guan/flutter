@@ -146,6 +146,7 @@ IMPELLER_EXTERN_C ImpellerContext ImpellerContextCreateMetalNew(
 #endif  // IMPELLER_ENABLE_METAL
 }
 
+#if IMPELLER_ENABLE_VULKAN
 IMPELLER_EXTERN_C ImpellerContext ImpellerContextCreateVulkanNew(
     uint32_t version,
     const ImpellerContextVulkanSettings* settings) {
@@ -164,6 +165,7 @@ IMPELLER_EXTERN_C ImpellerContext ImpellerContextCreateVulkanNew(
   return nullptr;
 #endif  // IMPELLER_ENABLE_VULKAN
 }
+#endif
 
 IMPELLER_EXTERN_C
 void ImpellerContextRetain(ImpellerContext context) {
@@ -175,6 +177,7 @@ void ImpellerContextRelease(ImpellerContext context) {
   ObjectBase::SafeRelease(context);
 }
 
+#if IMPELLER_ENABLE_VULKAN
 IMPELLER_EXTERN_C
 bool ImpellerContextGetVulkanInfo(ImpellerContext IMPELLER_NONNULL context,
                                   ImpellerContextVulkanInfo* out_vulkan_info) {
@@ -223,6 +226,7 @@ ImpellerSurface ImpellerVulkanSwapchainAcquireNextSurfaceNew(
     ImpellerVulkanSwapchain swapchain) {
   return GetPeer(swapchain)->AcquireNextSurface().Leak();
 }
+#endif
 #endif
 
 IMPELLER_EXTERN_C ImpellerDisplayListBuilder ImpellerDisplayListBuilderNew(

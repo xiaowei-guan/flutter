@@ -74,26 +74,27 @@ ScopedObject<Context> PlaygroundTest::CreateContext() const {
           &playground_gl_proc_address_callback));
     }
     case PlaygroundBackend::kVulkan:
-      ImpellerContextVulkanSettings settings = {};
-      struct UserData {
-        Playground::VKProcAddressResolver resolver;
-      } user_data;
-      user_data.resolver = CreateVKProcAddressResolver();
-      settings.user_data = &user_data;
-      settings.enable_vulkan_validation = switches_.enable_vulkan_validation;
-      settings.proc_address_callback = [](void* instance,         //
-                                          const char* proc_name,  //
-                                          void* user_data         //
-                                          ) -> void* {
-        auto resolver = reinterpret_cast<UserData*>(user_data)->resolver;
-        if (resolver) {
-          return resolver(instance, proc_name);
-        } else {
-          return nullptr;
-        }
-      };
-      return Adopt<Context>(
-          ImpellerContextCreateVulkanNew(ImpellerGetVersion(), &settings));
+    //   ImpellerContextVulkanSettings settings = {};
+    //   struct UserData {
+    //     Playground::VKProcAddressResolver resolver;
+    //   } user_data;
+    //   user_data.resolver = CreateVKProcAddressResolver();
+    //   settings.user_data = &user_data;
+    //   settings.enable_vulkan_validation = switches_.enable_vulkan_validation;
+    //   settings.proc_address_callback = [](void* instance,         //
+    //                                       const char* proc_name,  //
+    //                                       void* user_data         //
+    //                                       ) -> void* {
+    //     auto resolver = reinterpret_cast<UserData*>(user_data)->resolver;
+    //     if (resolver) {
+    //       return resolver(instance, proc_name);
+    //     } else {
+    //       return nullptr;
+    //     }
+    //   };
+    //   return Adopt<Context>(
+    //       ImpellerContextCreateVulkanNew(ImpellerGetVersion(), &settings));
+      break;
   }
   FML_UNREACHABLE();
 }

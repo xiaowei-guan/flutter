@@ -36,7 +36,7 @@ template("fixtures_location") {
   location_source = [
     "namespace flutter { namespace testing { ",
     "const char* GetSourcePath() {return \"$source_path\";} ",
-    "const char* GetFixturesPath() {return \"$location_path\";} ",
+    "const char* GetFixturesPathOG() {return \"$location_path\";} ",
     "const char* GetTestingAssetsPath() {return \"$testing_assets_path\";} ",
     "}}",
   ]
