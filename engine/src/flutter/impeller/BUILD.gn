@@ -62,17 +62,17 @@ executable("tizen_unittests") {
     "runtime_stage:runtime_stage_unittests",
     "shader_archive:shader_archive_unittests",
     "tessellator:tessellator_unittests",
-    #"toolkit/interop:interop_unittests",
+    "toolkit/interop:interop_unittests",
     "//flutter/testing:testing",
   ]
 
   #if (impeller_supports_rendering) {
     deps += [
-  #    "display_list:aiks_unittests",
+      "display_list:aiks_unittests",
   #    "display_list:display_list_unittests",
   #    "entity:entity_unittests",
-  #    "fixtures",
-  #    "geometry:geometry_unittests",
+      "fixtures",
+      "geometry:geometry_unittests",
        "playground",
   #    "renderer:renderer_unittests",
   #    "typographer:typographer_unittests",

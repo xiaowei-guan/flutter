@@ -43,9 +43,9 @@ config("playground_config") {
   ]
   libs = [
     #"base-utils-i18n",
-    "capi-appfw-application",
+    #"capi-appfw-application",
     "capi-appfw-app-common",
-    "capi-appfw-app-control",
+    #"capi-appfw-app-control",
     "capi-appfw-preference",
     #"capi-base-common",
     #"capi-system-info",
