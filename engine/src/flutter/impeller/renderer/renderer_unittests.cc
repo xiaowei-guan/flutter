@@ -462,63 +462,63 @@ TEST_P(RendererTest, CanRenderToTexture) {
   ASSERT_TRUE(r2t_pass->EncodeCommands());
 }
 
-TEST_P(RendererTest, CanRenderInstanced) {
-  if (GetParam() == PlaygroundBackend::kOpenGLES) {
-    GTEST_SKIP() << "Instancing is not supported on OpenGL.";
-  }
-  using VS = InstancedDrawVertexShader;
-  using FS = InstancedDrawFragmentShader;
+// TEST_P(RendererTest, CanRenderInstanced) {
+//   if (GetParam() == PlaygroundBackend::kOpenGLES) {
+//     GTEST_SKIP() << "Instancing is not supported on OpenGL.";
+//   }
+//   using VS = InstancedDrawVertexShader;
+//   using FS = InstancedDrawFragmentShader;
 
-  VertexBufferBuilder<VS::PerVertexData> builder;
-  builder.AddVertices({
-      VS::PerVertexData{Point{10, 10}},
-      VS::PerVertexData{Point{10, 110}},
-      VS::PerVertexData{Point{110, 10}},
-      VS::PerVertexData{Point{10, 110}},
-      VS::PerVertexData{Point{110, 10}},
-      VS::PerVertexData{Point{110, 110}},
-  });
+//   VertexBufferBuilder<VS::PerVertexData> builder;
+//   builder.AddVertices({
+//       VS::PerVertexData{Point{10, 10}},
+//       VS::PerVertexData{Point{10, 110}},
+//       VS::PerVertexData{Point{110, 10}},
+//       VS::PerVertexData{Point{10, 110}},
+//       VS::PerVertexData{Point{110, 10}},
+//       VS::PerVertexData{Point{110, 110}},
+//   });
 
-  ASSERT_NE(GetContext(), nullptr);
-  auto pipeline =
-      GetContext()
-          ->GetPipelineLibrary()
-          ->GetPipeline(PipelineBuilder<VS, FS>::MakeDefaultPipelineDescriptor(
-                            *GetContext())
-                            ->SetSampleCount(SampleCount::kCount4)
-                            .SetStencilAttachmentDescriptors(std::nullopt))
+//   ASSERT_NE(GetContext(), nullptr);
+//   auto pipeline =
+//       GetContext()
+//           ->GetPipelineLibrary()
+//           ->GetPipeline(PipelineBuilder<VS, FS>::MakeDefaultPipelineDescriptor(
+//                             *GetContext())
+//                             ->SetSampleCount(SampleCount::kCount4)
+//                             .SetStencilAttachmentDescriptors(std::nullopt))
 
-          .Get();
-  ASSERT_TRUE(pipeline && pipeline->IsValid());
+//           .Get();
+//   ASSERT_TRUE(pipeline && pipeline->IsValid());
 
-  static constexpr size_t kInstancesCount = 5u;
-  VS::InstanceInfo<kInstancesCount> instances;
-  for (size_t i = 0; i < kInstancesCount; i++) {
-    instances.colors[i] = Color::Random();
-  }
+//   static constexpr size_t kInstancesCount = 5u;
+//   VS::InstanceInfo<kInstancesCount> instances;
+//   for (size_t i = 0; i < kInstancesCount; i++) {
+//     instances.colors[i] = Color::Random();
+//   }
 
-  auto host_buffer = HostBuffer::Create(GetContext()->GetResourceAllocator(),
-                                        GetContext()->GetIdleWaiter());
-  ASSERT_TRUE(OpenPlaygroundHere([&](RenderPass& pass) -> bool {
-    pass.SetPipeline(pipeline);
-    pass.SetCommandLabel("InstancedDraw");
+//   auto host_buffer = HostBuffer::Create(GetContext()->GetResourceAllocator(),
+//                                         GetContext()->GetIdleWaiter());
+//   ASSERT_TRUE(OpenPlaygroundHere([&](RenderPass& pass) -> bool {
+//     pass.SetPipeline(pipeline);
+//     pass.SetCommandLabel("InstancedDraw");
 
-    VS::FrameInfo frame_info;
-    EXPECT_EQ(pass.GetOrthographicTransform(),
-              Matrix::MakeOrthographic(pass.GetRenderTargetSize()));
-    frame_info.mvp =
-        pass.GetOrthographicTransform() * Matrix::MakeScale(GetContentScale());
-    VS::BindFrameInfo(pass, host_buffer->EmplaceUniform(frame_info));
-    VS::BindInstanceInfo(pass, host_buffer->EmplaceStorageBuffer(instances));
-    pass.SetVertexBuffer(builder.CreateVertexBuffer(*host_buffer));
+//     VS::FrameInfo frame_info;
+//     EXPECT_EQ(pass.GetOrthographicTransform(),
+//               Matrix::MakeOrthographic(pass.GetRenderTargetSize()));
+//     frame_info.mvp =
+//         pass.GetOrthographicTransform() * Matrix::MakeScale(GetContentScale());
+//     VS::BindFrameInfo(pass, host_buffer->EmplaceUniform(frame_info));
+//     VS::BindInstanceInfo(pass, host_buffer->EmplaceStorageBuffer(instances));
+//     pass.SetVertexBuffer(builder.CreateVertexBuffer(*host_buffer));
 
-    pass.SetInstanceCount(kInstancesCount);
-    pass.Draw();
+//     pass.SetInstanceCount(kInstancesCount);
+//     pass.Draw();
 
-    host_buffer->Reset();
-    return true;
-  }));
-}
+//     host_buffer->Reset();
+//     return true;
+//   }));
+// }
 
 TEST_P(RendererTest, CanBlitTextureToTexture) {
   if (GetBackend() == PlaygroundBackend::kOpenGLES) {

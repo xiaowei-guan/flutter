@@ -69,19 +69,19 @@ executable("tizen_unittests") {
   #if (impeller_supports_rendering) {
     deps += [
       "display_list:aiks_unittests",
-  #    "display_list:display_list_unittests",
-  #    "entity:entity_unittests",
+      "display_list:display_list_unittests",
+      "entity:entity_unittests",
       "fixtures",
       "geometry:geometry_unittests",
-       "playground",
-  #    "renderer:renderer_unittests",
-  #    "typographer:typographer_unittests",
+      "playground",
+      "renderer:renderer_unittests",
+      "typographer:typographer_unittests",
    ]
   #}
 
-  #if (impeller_enable_opengles) {
-  #  deps += [ "//flutter/impeller/renderer/backend/gles:gles_unittests" ]
-  #}
+  if (impeller_enable_opengles) {
+    deps += [ "//flutter/impeller/renderer/backend/gles:gles_unittests" ]
+  }
 
   ldflags = [ "-Wl,--unresolved-symbols=ignore-in-shared-libs" ]
 
