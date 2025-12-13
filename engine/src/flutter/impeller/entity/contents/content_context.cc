@@ -124,6 +124,7 @@ class Variants : public GenericVariants {
       VALIDATION_LOG << "Failed to create default pipeline.";
       return;
     }
+    context.GetPipelineLibrary()->LogPipelineCreation(*desc);
     options.ApplyToPipelineDescriptor(*desc);
     desc_ = desc;
     if (context.GetFlags().lazy_shader_mode) {
