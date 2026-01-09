@@ -127,12 +127,8 @@ class Variants : public GenericVariants {
     context.GetPipelineLibrary()->LogPipelineCreation(*desc);
     options.ApplyToPipelineDescriptor(*desc);
     desc_ = desc;
-    if (context.GetFlags().lazy_shader_mode) {
-      SetDefault(options, nullptr);
-    } else {
-      SetDefault(options, std::make_unique<PipelineHandleT>(context, desc_,
-                                                            /*async=*/true));
-    }
+    SetDefault(options, std::make_unique<PipelineHandleT>(context, desc_,
+                                                          /*async=*/true));
   }
 
   PipelineHandleT* Get(const ContentContextOptions& options) const {
@@ -163,7 +159,8 @@ template <class RenderPipelineHandleT>
 RenderPipelineHandleT* CreateIfNeeded(
     const ContentContext* context,
     Variants<RenderPipelineHandleT>& container,
-    ContentContextOptions opts) {
+    ContentContextOptions opts,
+    PipelineCompileQueue* compile_queue) {
   if (!context->IsValid()) {
     return nullptr;
   }
@@ -182,7 +179,7 @@ RenderPipelineHandleT* CreateIfNeeded(
   FML_CHECK(default_handle != nullptr);
 
   const std::shared_ptr<Pipeline<PipelineDescriptor>>& pipeline =
-      default_handle->WaitAndGet();
+      default_handle->WaitAndGet(compile_queue);
   if (!pipeline) {
     return nullptr;
   }
@@ -203,11 +200,14 @@ template <class TypedPipeline>
 PipelineRef GetPipeline(const ContentContext* context,
                         Variants<TypedPipeline>& container,
                         ContentContextOptions opts) {
-  TypedPipeline* pipeline = CreateIfNeeded(context, container, opts);
+  auto compile_queue =
+      context->GetContext()->GetPipelineLibrary()->GetPipelineCompileQueue();
+  TypedPipeline* pipeline =
+      CreateIfNeeded(context, container, opts, compile_queue);
   if (!pipeline) {
     return raw_ptr<Pipeline<PipelineDescriptor>>();
   }
-  return raw_ptr(pipeline->WaitAndGet());
+  return raw_ptr(pipeline->WaitAndGet(compile_queue));
 }
 
 }  // namespace
@@ -687,14 +687,9 @@ ContentContext::ContentContext(
     }
     clip_pipeline_descriptor->SetColorAttachmentDescriptors(
         std::move(clip_color_attachments));
-    if (GetContext()->GetFlags().lazy_shader_mode) {
-      pipelines_->clip.SetDefaultDescriptor(clip_pipeline_descriptor);
-      pipelines_->clip.SetDefault(options, nullptr);
-    } else {
-      pipelines_->clip.SetDefault(
-          options,
-          std::make_unique<ClipPipeline>(*context_, clip_pipeline_descriptor));
-    }
+    pipelines_->clip.SetDefault(
+        options,
+        std::make_unique<ClipPipeline>(*context_, clip_pipeline_descriptor));
     pipelines_->texture_downsample.CreateDefault(
         *context_, options_no_msaa_no_depth_stencil);
     pipelines_->rrect_blur.CreateDefault(*context_, options_trianglestrip);
@@ -1000,9 +995,6 @@ void ContentContext::ResetTransientsBuffers() {
 }
 
 void ContentContext::InitializeCommonlyUsedShadersIfNeeded() const {
-  if (GetContext()->GetFlags().lazy_shader_mode) {
-    return;
-  }
   GetContext()->InitializeCommonlyUsedShadersIfNeeded();
 }
 
