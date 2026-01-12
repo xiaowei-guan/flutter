@@ -5,6 +5,7 @@
 #ifndef FLUTTER_SHELL_PLATFORM_EMBEDDER_EMBEDDER_EXTERNAL_TEXTURE_GL_H_
 #define FLUTTER_SHELL_PLATFORM_EMBEDDER_EMBEDDER_EXTERNAL_TEXTURE_GL_H_
 
+#include <unordered_map>
 #include "flutter/common/graphics/texture.h"
 #include "flutter/fml/macros.h"
 #include "flutter/shell/platform/embedder/embedder.h"
@@ -26,8 +27,8 @@ class EmbedderExternalTextureGL : public flutter::Texture {
  private:
   const ExternalTextureCallback& external_texture_callback_;
   sk_sp<DlImage> last_image_;
-  std::shared_ptr<impeller::TextureGLES> texture_image_ = nullptr;
-  impeller::TextureDescriptor desc_;
+  std::unordered_map<GLuint, std::shared_ptr<impeller::TextureGLES>>
+      impeller_gl_textures_;
   sk_sp<DlImage> ResolveTexture(int64_t texture_id,
                                 GrDirectContext* context,
                                 impeller::AiksContext* aiks_context,
@@ -40,11 +41,6 @@ class EmbedderExternalTextureGL : public flutter::Texture {
   sk_sp<DlImage> ResolveTextureImpeller(int64_t texture_id,
                                         impeller::AiksContext* aiks_context,
                                         const SkISize& size);
-
-  bool IsExternalTextureChanged(FlutterOpenGLTexture* texture);
-  std::shared_ptr<impeller::TextureGLES> CreateImpellerTexture(
-      impeller::AiksContext* aiks_context,
-      FlutterOpenGLTexture* texture);
 
   // |flutter::Texture|
   void Paint(PaintContext& context,
