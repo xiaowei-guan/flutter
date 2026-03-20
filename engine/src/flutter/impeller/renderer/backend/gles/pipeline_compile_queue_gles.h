@@ -26,9 +26,8 @@ class PipelineCompileQueueGLES : public PipelineCompileQueue {
   PipelineCompileQueueGLES& operator=(const PipelineCompileQueueGLES&) = delete;
 
   //----------------------------------------------------------------------------
-  /// @brief      Post a compile job for the specified descriptor.
+  /// @brief      Post a job to the worker task runner.
   ///
-  /// @param[in]  desc  The description
   /// @param[in]  job   The job
   ///
   void PostJob(const fml::closure& job) override;

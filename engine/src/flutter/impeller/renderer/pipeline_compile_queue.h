@@ -39,7 +39,7 @@ namespace impeller {
 ///             entirely optional. The queue skipping mechanism all assume the
 ///             optional availability of a compile queue.
 ///
-class PipelineCompileQueue final
+class PipelineCompileQueue
     : public std::enable_shared_from_this<PipelineCompileQueue> {
  public:
   PipelineCompileQueue() = default;
@@ -90,9 +90,6 @@ class PipelineCompileQueue final
                      ComparableHash<PipelineDescriptor>,
                      ComparableEqual<PipelineDescriptor>>
       pending_jobs_ IPLR_GUARDED_BY(pending_jobs_mutex_);
-
-  explicit PipelineCompileQueue(
-      std::shared_ptr<fml::BasicTaskRunner> worker_task_runner);
 
   fml::closure TakeJob(const PipelineDescriptor& desc);
 

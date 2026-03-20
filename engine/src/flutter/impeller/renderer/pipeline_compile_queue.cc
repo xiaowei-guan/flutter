@@ -31,12 +31,12 @@ bool PipelineCompileQueue::PostJobForDescriptor(const PipelineDescriptor& desc,
                         "Running eagerly.";
       // Don't invoke the job here has there are we have currently acquired a
       // mutex.
-      worker_task_runner_->PostTask(job);
+      PostJob(job);
       return true;
     }
   }
 
-  worker_task_runner_->PostTask([weak_queue = weak_from_this()]() {
+  PostJob([weak_queue = weak_from_this()]() {
     if (auto queue = weak_queue.lock()) {
       queue->DoOneJob();
     }

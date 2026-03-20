@@ -20,15 +20,11 @@ PipelineCompileQueueGLES::PipelineCompileQueueGLES(
     : PipelineCompileQueue(),
       worker_task_runner_(std::move(worker_task_runner)) {}
 
-PipelineCompileQueueGLES::~PipelineCompileQueueGLES() {
-  FinishAllJobs();
-}
+PipelineCompileQueueGLES::~PipelineCompileQueueGLES() {}
 
-bool PipelineCompileQueueGLES::PostJobForDescriptor(
-    const PipelineDescriptor& desc,
-    const fml::closure& job) {
+void PipelineCompileQueueGLES::PostJob(const fml::closure& job) {
   if (!job) {
-    return false;
+    return;
   }
 
   worker_task_runner_->PostTask(job);
