@@ -105,12 +105,16 @@ sk_sp<DlImage> EmbedderExternalTextureVulkan::ResolveTexture(
   } else {
     return nullptr;
   }
+  return nullptr;
 }
 
 sk_sp<DlImage> EmbedderExternalTextureVulkan::ResolveTextureSkia(
     int64_t texture_id,
     GrDirectContext* context,
     const SkISize& size) {
+  if (!context) {
+    return nullptr;
+  }
   context->flushAndSubmit();
   context->resetContext(kAll_GrBackendState);
   std::unique_ptr<FlutterVulkanTexture> texture =
@@ -173,7 +177,7 @@ sk_sp<DlImage> EmbedderExternalTextureVulkan::ResolveTextureSkia(
       SkImages::BorrowTextureFrom(context,                   // context
                                   gr_backend_texture,        // texture handle
                                   kTopLeft_GrSurfaceOrigin,  // origin
-                                  color_type,                // color type
+                                  kRGBA_8888_SkColorType,    // color type
                                   kPremul_SkAlphaType,       // alpha type
                                   nullptr,                   // colorspace
                                   release_proc,       // texture release proc
