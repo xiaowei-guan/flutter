@@ -117,7 +117,7 @@ sk_sp<DlImage> EmbedderExternalTextureVulkan::ResolveTextureSkia(
   }
   context->flushAndSubmit();
   context->resetContext(kAll_GrBackendState);
-  std::unique_ptr<FlutterVulkanTexture> texture =
+  std::unique_ptr<FlutterVulkanExternalTexture> texture =
       external_texture_callback_(texture_id, size.width(), size.height());
 
   if (!texture) {
@@ -200,7 +200,7 @@ sk_sp<DlImage> EmbedderExternalTextureVulkan::ResolveTextureImpeller(
     int64_t texture_id,
     impeller::AiksContext* aiks_context,
     const SkISize& size) {
-  std::unique_ptr<FlutterVulkanTexture> texture_desc =
+  std::unique_ptr<FlutterVulkanExternalTexture> texture_desc =
       external_texture_callback_(texture_id, size.width(), size.height());
   if (!texture_desc) {
     return nullptr;

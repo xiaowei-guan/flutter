@@ -29,7 +29,7 @@ bool RequiresYCBCRConversion(impeller::vk::Format format) {
 
 EmbedderExternalTextureSourceVulkan::EmbedderExternalTextureSourceVulkan(
     const std::shared_ptr<impeller::Context>& p_context,
-    FlutterVulkanTexture* embedder_desc)
+    FlutterVulkanExternalTexture* embedder_desc)
     : TextureSourceVK(ToTextureDescriptor(embedder_desc)),
       destruction_callback_(embedder_desc->destruction_callback),
       destruction_callback_user_data_(embedder_desc->user_data) {
@@ -41,8 +41,6 @@ EmbedderExternalTextureSourceVulkan::EmbedderExternalTextureSourceVulkan(
   const auto& device = context.GetDevice();
   texture_image_ =
       impeller::vk::Image(reinterpret_cast<VkImage>(embedder_desc->image));
-  destruction_callback_ = embedder_desc->destruction_callback;
-  user_data_ = embedder_desc->user_data;
 
   needs_yuv_conversion_ = RequiresYCBCRConversion(
       static_cast<impeller::vk::Format>(embedder_desc->format));
@@ -64,12 +62,6 @@ EmbedderExternalTextureSourceVulkan::EmbedderExternalTextureSourceVulkan(
 
   yuv_conversion_ = std::move(yuv_conversion);
   is_valid_ = true;
-}
-
-EmbedderExternalTextureSourceVulkan::~EmbedderExternalTextureSourceVulkan() {
-  if (destruction_callback_) {
-    destruction_callback_(user_data_);
-  }
 }
 
 impeller::PixelFormat ToPixelFormat(uint32_t vk_format) {
@@ -105,7 +97,7 @@ impeller::PixelFormat ToPixelFormat(uint32_t vk_format) {
 
 impeller::TextureDescriptor
 EmbedderExternalTextureSourceVulkan::ToTextureDescriptor(
-    FlutterVulkanTexture* embedder_desc) {
+    FlutterVulkanExternalTexture* embedder_desc) {
   const auto size =
       impeller::ISize{static_cast<int64_t>(embedder_desc->width),
                       static_cast<int64_t>(embedder_desc->height)};
@@ -129,7 +121,7 @@ EmbedderExternalTextureSourceVulkan::ToTextureDescriptor(
 std::shared_ptr<impeller::YUVConversionVK>
 EmbedderExternalTextureSourceVulkan::CreateYUVConversion(
     const impeller::ContextVK& context,
-    FlutterVulkanTexture* embedder_desc) {
+    FlutterVulkanExternalTexture* embedder_desc) {
   impeller::YUVConversionDescriptorVK conversion_chain;
   auto& conversion_info = conversion_chain.get();
 
@@ -151,7 +143,7 @@ EmbedderExternalTextureSourceVulkan::CreateYUVConversion(
 
 bool EmbedderExternalTextureSourceVulkan::CreateTextureImageView(
     const impeller::vk::Device& device,
-    FlutterVulkanTexture* embedder_desc,
+    FlutterVulkanExternalTexture* embedder_desc,
     const std::shared_ptr<impeller::YUVConversionVK>& yuv_conversion_wrapper) {
   impeller::vk::StructureChain<impeller::vk::ImageViewCreateInfo,
                                impeller::vk::SamplerYcbcrConversionInfo>
