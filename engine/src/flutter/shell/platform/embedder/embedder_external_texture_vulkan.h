@@ -33,9 +33,7 @@ class EmbedderExternalTextureSourceVulkan final
   impeller::vk::ImageView GetImageView() const override;
 
   // |TextureSourceVK|
-  impeller::vk::ImageView GetRenderTargetView(
-      uint32_t mip_level,
-      uint32_t array_layer) const override;
+  impeller::vk::ImageView GetRenderTargetView() const override;
 
   bool IsValid() const;
 
