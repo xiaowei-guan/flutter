@@ -959,7 +959,7 @@ typedef bool (*FlutterVulkanPresentCallback)(
     const FlutterVulkanImage* /* image */);
 
 typedef struct {
-  /// The size of this struct. Must be sizeof(FlutterVulkanTexture).
+  /// The size of this struct. Must be sizeof(FlutterVulkanExternalTexture).
   size_t struct_size;
   /// Handle to the VkImage that is owned by the embedder. The engine will
   /// sample from this image during composition. The VkImage must be in the
