@@ -95,6 +95,7 @@ EmbedderExternalTextureSourceVulkan::EmbedderExternalTextureSourceVulkan(
 }
 
 EmbedderExternalTextureSourceVulkan::~EmbedderExternalTextureSourceVulkan() {
+  texture_image_view_.reset();
   if (destruction_callback_) {
     destruction_callback_(user_data_);
   }
