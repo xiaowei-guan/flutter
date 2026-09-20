@@ -1056,7 +1056,9 @@ typedef struct {
   /// When the embedder specifies that a texture has a frame available, the
   /// engine will call this method (on an internal engine managed thread) so
   /// that external texture details can be supplied to the engine for subsequent
-  /// composition.
+  /// composition. Prior to returning from this callback, the embedder must
+  /// perform a host sync, and so the engine can sample the VkImage without any
+  /// additional synchronization.
   FlutterVulkanTextureFrameCallback external_texture_frame_callback;
   /// The path to the Vulkan pipeline cache data.
   /// The string can be collected after the call to `FlutterEngineRun` returns.
